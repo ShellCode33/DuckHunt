@@ -11,10 +11,10 @@
 #include <SDL_image.h>
 
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
+#define SCREEN_WIDTH 750
+#define SCREEN_HEIGHT 761
 #define SCREEN_BPP 32
 
-SDL_Surface* loadImageWithColorKey(char* filename, int r, int g, int b);
+SDL_Surface* loadImageWithColorKey(const char* filename, bool colorkey, int r, int g, int b);
 
 #endif
