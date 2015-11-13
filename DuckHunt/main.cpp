@@ -1,6 +1,6 @@
-#include "utils.h"
+#include "main.h"
 
-int main(int argc, char** argv)
+int main()
 {
     // initialize SDL video
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -23,12 +23,17 @@ int main(int argc, char** argv)
 
     //-------------------- init variables ------------------------
 
-    SDL_Surface* background = loadImageWithColorKey("/mnt/roon/users/cfleury002/Documents/Algo-Prog/DuckHunt/res/sprites/backGame.png", false, 0, 0, 0);
+    SDL_Surface* entity_sprites = loadImageWithColorKey("res/sprites/duck.png", true, 228, 255, 0);
+    SDL_Surface* background = loadImageWithColorKey("res/sprites/backGame.png", false, 0, 0, 0);
 
     SDL_Rect dst_background;
     dst_background.x = dst_background.y = 0;
     dst_background.w = background->w;
     dst_background.h = background->h;
+
+    Dog dog;
+    dogIsComing = true;
+    initDog(entity_sprites, dog);
 
     //------------------------------------------------------------
 
@@ -65,7 +70,19 @@ int main(int argc, char** argv)
 
         // clear screen
         SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 0, 0));
-        SDL_BlitSurface(background, NULL, screen, &dst_background);
+        SDL_BlitSurface(background, NULL, screen, &dst_background); //on affiche l'image de fond
+
+        if(dogIsComing)
+        {
+            dog.mvt_x = 5;
+            moveDog(dog);
+            showDog(screen, dog);
+
+            SDL_Delay(60); //On rajoute un delai supplémentaire quand le chien arrive, c'est le début du jeu
+
+            if(dog.sprite->x >= SCREEN_WIDTH/2)
+                dogIsComing = false;
+        }
 
         // DRAWING ENDS HERE
 
