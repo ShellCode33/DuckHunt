@@ -9,6 +9,12 @@ int main()
         return 1;
     }
 
+    if(TTF_Init() < 0)
+    {
+        fprintf(stderr, "Erreur d'initialisation de TTF_Init : %s\n", TTF_GetError());
+        exit(EXIT_FAILURE);
+    }
+
     // make sure SDL cleans up before exit
     atexit(SDL_Quit);
 
@@ -25,6 +31,25 @@ int main()
 
     SDL_Surface* entity_sprites = loadImageWithColorKey("res/sprites/duck.png", true, 228, 255, 0);
     SDL_Surface* background = loadImageWithColorKey("res/sprites/backGame.png", false, 0, 0, 0);
+
+    SDL_Surface* menu_img = loadImageWithColorKey("res/sprites/menu.png", false, 0, 0, 0);
+
+
+    TTF_Font* small_font = TTF_OpenFont("res/font/duck_hunt.ttf", 65);
+    TTF_Font* big_font = TTF_OpenFont("res/font/duck_hunt.ttf", 90);
+    SDL_Color blackcolor = {0,0,0};
+
+    Button singleplayer;
+    singleplayer.surface = TTF_RenderText_Solid(small_font, "Play", blackcolor);
+    singleplayer.x = SCREEN_WIDTH/2;
+    singleplayer.y = SCREEN_HEIGHT/3;
+    singleplayer.select = true;
+
+    Button quit;
+    quit.surface = TTF_RenderText_Solid(small_font, "Quit", blackcolor);
+    quit.x = SCREEN_WIDTH/2;
+    quit.y = SCREEN_HEIGHT/2;
+    quit.select = false;
 
     SDL_Rect dst_background;
     dst_background.x = dst_background.y = 0;
@@ -72,6 +97,9 @@ int main()
         SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 0, 0));
         SDL_BlitSurface(background, NULL, screen, &dst_background); //on affiche l'image de fond
 
+	detectKeyboardMenu(singleplayer, quit);
+        showMenu(screen, menu_img, small_font, big_font, singleplayer, quit);
+
         if(dogIsComing)
         {
             dog.mvt_x = 5;
@@ -91,6 +119,8 @@ int main()
         SDL_Delay(10);
     } // end main loop
 
+    TTF_CloseFont(small_font);
+    TTF_CloseFont(big_font);
     SDL_FreeSurface(background);
     SDL_Quit();
 

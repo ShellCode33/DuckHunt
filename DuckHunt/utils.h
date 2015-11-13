@@ -26,6 +26,14 @@ struct Sprite
     SDL_Rect *rect_dst;
 };
 
+struct Button
+{
+    bool select;
+    SDL_Surface* surface;
+    int x;
+    int y;
+};
+
 SDL_Surface* loadImageWithColorKey(const char* filename, bool colorkey, int r, int g, int b);
 
 #endif
