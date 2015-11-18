@@ -1,6 +1,8 @@
 #ifndef DUCK_H
 #define DUCK_H
 
+#include "utils.h"
+
 struct Duck
 {
     Sprite *sprite;
