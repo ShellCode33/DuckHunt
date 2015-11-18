@@ -27,6 +27,8 @@ int main()
         return 1;
     }
 
+    srand(time(NULL)); //Initialise la generation aleatoire
+
     //-------------------- init variables ------------------------
 
     SDL_Surface* entity_sprites = loadImageWithColorKey("res/sprites/duck.png", true, 228, 255, 0);
@@ -59,6 +61,8 @@ int main()
 
     Dog dog;
     initDog(entity_sprites, dog);
+
+    Duck duck;
 
     //------------------------------------------------------------
 
