@@ -3,7 +3,13 @@
 
 #include "utils.h"
 #include "dog.h"
+#include "duck.h"
+#include "menu.h"
 
-bool dogIsComing; //En début de jeu, lorsque le chien arrive
+enum Display
+{
+    MENU,
+    GAME
+};
 
 #endif

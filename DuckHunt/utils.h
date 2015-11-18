@@ -9,7 +9,9 @@
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
-
+#include <SDL/SDL_ttf.h>
+#include <time.h>
+#include <stdio.h>
 
 #define SCREEN_WIDTH 750
 #define SCREEN_HEIGHT 761

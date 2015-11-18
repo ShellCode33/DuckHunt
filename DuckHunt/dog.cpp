@@ -2,18 +2,22 @@
 
 void initDog(SDL_Surface* entity_sprites, Dog &dog)
 {
+    dog.isComing = true;
+    dog.isJumping = false;
+    dog.cooldown = 0;
+
     dog.sprite = new Sprite;
     dog.sprite->img = entity_sprites;
     dog.nbr_sprite = 5; //dans un premier temps on met à 5 car au début du jeu lorsque le chien arrive, il n'y a que 5 animations différentes
     dog.sprite->h = 94;
     dog.sprite->w = 114;
     dog.sprite->x = 0;
-    dog.sprite->y = SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 5;
+    dog.sprite->y = SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 4;
 
     dog.sprite->rect_src = new SDL_Rect;
     dog.sprite->rect_src->h = dog.sprite->h;
     dog.sprite->rect_src->w = dog.sprite->w;
-    dog.sprite->rect_src->x = 0;
+    dog.sprite->rect_src->x = 5;
     dog.sprite->rect_src->y = 0;
 
     dog.sprite->rect_dst = new SDL_Rect;
@@ -38,12 +42,46 @@ void showDog(SDL_Surface *screen, Dog &dog)
 {
     SDL_BlitSurface(dog.sprite->img, dog.sprite->rect_src, screen, dog.sprite->rect_dst);
 
-    dog.sprite->rect_src->x += dog.sprite->w;
-    dog.sprite->rect_src->x %= dog.sprite->w * (dog.nbr_sprite-1);
+    if(dog.nbr_sprite > 1)
+    {
+        dog.sprite->rect_src->x += dog.sprite->w;
+        dog.sprite->rect_src->x %= (dog.sprite->w * dog.nbr_sprite);
+    }
 }
 
-void changeDogStat(Dog &dog)
+void changeDogAnimation(Dog &dog, int anim_type)
 {
-    //Pas encore implémenté
-    //change l'état du chien en fonction de si il arrive au début, si il montre les canard tués, si il saute dans l'herbe etc...
+    switch(anim_type)
+    {
+        case 1: //waiting
+            dog.nbr_sprite = 1;
+            dog.sprite->rect_src->x = 0;
+            dog.sprite->rect_src->y = 110;
+            dog.sprite->h = 120;
+            dog.sprite->w = 114;
+            break;
+
+        case 2: //jumping 1
+            dog.nbr_sprite = 1;
+            dog.sprite->rect_src->x = 125;
+            dog.sprite->rect_src->y = 110;
+            dog.sprite->h = 110;
+            dog.sprite->w = 75;
+            break;
+
+        case 3: //jumping 2
+            dog.nbr_sprite = 1;
+            dog.sprite->rect_src->x = 210;
+            dog.sprite->rect_src->y = 110;
+            dog.sprite->h = 110;
+            dog.sprite->w = 75;
+            break;
+    }
+}
+
+void deleteDog(Dog &dog)
+{
+    delete dog.sprite->rect_dst;
+    delete dog.sprite->rect_src;
+    delete dog.sprite;
 }
