@@ -17,7 +17,7 @@ void detectKeyboardMenu(Button &singleplayer, Button &quit)
 
 void showMenu(SDL_Surface *screen, SDL_Surface *menu_img, TTF_Font* small_font, TTF_Font* big_font, Button &singleplayer, Button &quit)
 {
-    SDL_Color blackcolor = {0,0,0};
+    SDL_Color blackcolor = {0, 0, 0, 0};
 
     SDL_Rect text_rect;
     text_rect.x = singleplayer.x;

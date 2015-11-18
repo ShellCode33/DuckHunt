@@ -3,7 +3,8 @@
 
 #include "utils.h"
 #include "dog.h"
+#include "menu.h"
 
-bool dogIsComing; //En début de jeu, lorsque le chien arrive
+
 
 #endif
