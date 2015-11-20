@@ -27,6 +27,24 @@ void initDuck(SDL_Surface* entity_sprites, Duck &duck)
     duck.collision=false;
 }
 
+void processDuck(SDL_Surface *screen, Duck &duck)
+{
+    if (duck.sprite->x>(SCREEN_WIDTH-duck.sprite->w/2))
+    {
+        duck.mvt_x*=-1;
+        duck.mvt_y*=-1;
+    }
+
+//    else if(1)
+//    {
+//    ;
+//    }
+
+    moveDuck(duck);
+    showDuck(screen, duck);
+
+    SDL_Delay(20);
+}
 
 void moveDuck(Duck &duck)
 {

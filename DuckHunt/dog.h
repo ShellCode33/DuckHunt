@@ -20,5 +20,6 @@ void moveDog(Dog &dog);
 void showDog(SDL_Surface *screen, Dog &dog);
 void changeDogAnimation(Dog &dog, int anim_type);
 void deleteDog(Dog &dog);
+void processDog(SDL_Surface *screen, Dog &dog);
 
 #endif

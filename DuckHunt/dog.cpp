@@ -27,6 +27,64 @@ void initDog(SDL_Surface* entity_sprites, Dog &dog)
     dog.sprite->rect_dst->y = dog.sprite->y - dog.sprite->h / 2;
 }
 
+void processDog(SDL_Surface *screen, Dog &dog)
+{
+    printf("dog.isComing: %i -- dog.isWaiting: %i -- dog.isJumping: %i\n", dog.isComing, dog.isWaiting, dog.isJumping);
+
+    if(dog.isComing)
+    {
+        dog.mvt_x = 7;
+        moveDog(dog);
+        showDog(screen, dog);
+
+        SDL_Delay(30); //On rajoute un delai supplémentaire quand le chien arrive, c'est le début du jeu
+
+        if(dog.sprite->x >= SCREEN_WIDTH/2)
+        {
+            changeDogAnimation(dog, 1);
+            dog.isComing = false;
+            dog.isWaiting = true;
+            dog.cooldown = 50;
+        }
+    }
+
+    else if(dog.isWaiting)
+    {
+        moveDog(dog);
+        showDog(screen, dog);
+
+        dog.cooldown--;
+
+        if(dog.cooldown <= 0)
+        {
+            changeDogAnimation(dog, 2);
+            dog.isJumping = true;
+            dog.isWaiting = false;
+            dog.cooldown = 12;
+        }
+    }
+
+    else if(dog.isJumping)
+    {
+        dog.mvt_y = -5;
+        dog.mvt_x = 3;
+
+        if(dog.cooldown == 8)
+            changeDogAnimation(dog, 3);
+
+        if(dog.cooldown > 0)
+            dog.cooldown--;
+
+        else
+           dog.isJumping = false;
+
+        moveDog(dog);
+        showDog(screen, dog);
+
+        SDL_Delay(10);
+    }
+}
+
 void moveDog(Dog &dog)
 {
     dog.sprite->x += dog.mvt_x;
