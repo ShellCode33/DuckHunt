@@ -127,16 +127,17 @@ int main()
             case GAME:
             {
                 SDL_BlitSurface(background, NULL, screen, &dst_background); //on affiche l'image de fond
-		if(gameStarting)
-		{
-			processDog(screen, dog);
 
-			if(!dog.isComing && !dog.isWaiting && !dog.isJumping)
-				gameStarting = false;
+                if(gameStarting)
+                {
+                    processDog(screen, dog);
+
+                    if(!dog.isComing && !dog.isWaiting && !dog.isJumping)
+                        gameStarting = false;
                 }
 
-		else
-			processDuck(screen, duck);
+                else
+                    processDuck(screen, duck);
 
                 break;
             }

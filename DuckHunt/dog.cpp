@@ -58,7 +58,7 @@ void changeDogAnimation(Dog &dog, int anim_type)
             dog.sprite->rect_src->x = 0;
             dog.sprite->rect_src->y = 110;
             dog.sprite->h = 120;
-            dog.sprite->w = 114;
+            dog.sprite->w = 117;
             dog.sprite->rect_src->h = dog.sprite->h;
             dog.sprite->rect_src->w = dog.sprite->w;
             break;

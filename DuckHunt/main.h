@@ -12,6 +12,7 @@ enum Display
     GAME
 };
 
+void processDog(SDL_Surface *screen, Dog &dog);
 void processDuck(SDL_Surface *screen, Duck &duck);
 
 
