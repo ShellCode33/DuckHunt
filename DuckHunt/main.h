@@ -12,4 +12,7 @@ enum Display
     GAME
 };
 
+void processDuck(SDL_Surface *screen, Duck &duck);
+
+
 #endif

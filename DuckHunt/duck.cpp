@@ -21,6 +21,10 @@ void initDuck(SDL_Surface* entity_sprites, Duck &duck)
     duck.sprite->rect_dst->w = duck.sprite->w;
     duck.sprite->rect_dst->x = duck.sprite->x;
     duck.sprite->rect_dst->y = duck.sprite->y;
+
+    duck.mvt_x=5;
+    duck.mvt_y=5;
+    duck.collision=false;
 }
 
 
@@ -32,7 +36,6 @@ void moveDuck(Duck &duck)
     duck.sprite->rect_dst->x = duck.sprite->x - duck.sprite->w / 2;
     duck.sprite->rect_dst->y = duck.sprite->y - duck.sprite->h / 2;
 
-//    duck.mvt_x = duck.mvt_y = 0; //reset le mouvement
 }
 
 void showDuck(SDL_Surface *screen, Duck &duck)
