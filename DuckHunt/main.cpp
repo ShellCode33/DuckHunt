@@ -31,6 +31,8 @@ int main()
 
     //-------------------- init variables ------------------------
 
+    bool gameStarting = true;
+
     Display display = MENU;
 
     SDL_Surface* entity_sprites = loadImageWithColorKey("res/sprites/duck.png", true, 228, 255, 0);
@@ -65,6 +67,7 @@ int main()
     initDog(entity_sprites, dog);
 
     Duck duck;
+    initDuck(entity_sprites, duck);
 
     //------------------------------------------------------------
 
@@ -124,69 +127,16 @@ int main()
             case GAME:
             {
                 SDL_BlitSurface(background, NULL, screen, &dst_background); //on affiche l'image de fond
+		if(gameStarting)
+		{
+			processDog(screen, dog);
 
-                //detectKeyboardMenu(singleplayer, quit);
-                //showMenu(screen, menu_img, small_font, big_font, singleplayer, quit);
-
-                printf("dog.isComing: %i -- dog.isWaiting: %i -- dog.isJumping: %i\n", dog.isComing, dog.isWaiting, dog.isJumping);
-
-                if(dog.isComing)
-                {
-                    //dog.mvt_x = 5;
-                    dog.mvt_x = 5;
-                    moveDog(dog);
-                    showDog(screen, dog);
-
-                    SDL_Delay(60); //On rajoute un delai supplémentaire quand le chien arrive, c'est le début du jeu
-
-                    if(dog.sprite->x >= SCREEN_WIDTH/2)
-                    {
-                        changeDogAnimation(dog, 1);
-                        dog.isComing = false;
-                        dog.isWaiting = true;
-                        dog.cooldown = 50;
-                    }
+			if(!dog.isComing && !dog.isWaiting && !dog.isJumping)
+				gameStarting = false;
                 }
 
-                else if(dog.isWaiting)
-                {
-                    showDog(screen, dog);
-
-                    dog.cooldown--;
-
-                    if(dog.cooldown <= 0)
-                    {
-                        changeDogAnimation(dog, 2);
-                        dog.isJumping = true;
-                        dog.isWaiting = false;
-                        dog.cooldown = 50;
-                    }
-                }
-
-                else if(dog.isJumping)
-                {
-                    dog.mvt_y = -5;
-                    dog.mvt_x = 3;
-
-                    if(dog.cooldown == 25)
-                        changeDogAnimation(dog, 3);
-
-                    if(dog.cooldown > 0)
-                        dog.cooldown--;
-          /*
-                    else
-                    {
-                       dog.isJumping = false;
-                    }
-        */
-
-                    moveDog(dog);
-                    showDog(screen, dog);
-
-                    //SDL_BlitSurface(fake_background, NULL, screen, &dst_background); //on affiche la fausse image de fond qui va rencouvrir le chien
-
-                    SDL_Delay(60);
-                }
+		else
+			processDuck(screen, duck);
 
                 break;
             }
@@ -209,5 +159,82 @@ int main()
     // all is well ;)
     printf("Exited cleanly\n");
     return 0;
+}
+
+void processDog(SDL_Surface *screen, Dog &dog)
+{
+    printf("dog.isComing: %i -- dog.isWaiting: %i -- dog.isJumping: %i\n", dog.isComing, dog.isWaiting, dog.isJumping);
+
+    if(dog.isComing)
+    {
+        dog.mvt_x = 7;
+        moveDog(dog);
+        showDog(screen, dog);
+
+        SDL_Delay(30); //On rajoute un delai supplémentaire quand le chien arrive, c'est le début du jeu
+
+        if(dog.sprite->x >= SCREEN_WIDTH/2)
+        {
+            changeDogAnimation(dog, 1);
+            dog.isComing = false;
+            dog.isWaiting = true;
+            dog.cooldown = 50;
+        }
+    }
+
+    else if(dog.isWaiting)
+    {
+        moveDog(dog);
+        showDog(screen, dog);
+
+        dog.cooldown--;
+
+        if(dog.cooldown <= 0)
+        {
+            changeDogAnimation(dog, 2);
+            dog.isJumping = true;
+            dog.isWaiting = false;
+            dog.cooldown = 12;
+        }
+    }
+
+    else if(dog.isJumping)
+    {
+        dog.mvt_y = -5;
+        dog.mvt_x = 3;
+
+        if(dog.cooldown == 8)
+            changeDogAnimation(dog, 3);
+
+        if(dog.cooldown > 0)
+            dog.cooldown--;
+
+        else
+           dog.isJumping = false;
+
+        moveDog(dog);
+        showDog(screen, dog);
+
+        SDL_Delay(10);
+    }
+}
+
+void processDuck(SDL_Surface *screen, Duck &duck)
+{
+    if (duck.sprite->x>(SCREEN_WIDTH-duck.sprite->w/2))
+    {
+        duck.mvt_x*=-1;
+        duck.mvt_y*=-1;
+    }
+
+//    else if(1)
+//    {
+//    ;
+//    }
+
+    moveDuck(duck);
+    showDuck(screen, duck); 
+
+    SDL_Delay(20);
 }
 
