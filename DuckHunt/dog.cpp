@@ -12,7 +12,7 @@ void initDog(SDL_Surface* entity_sprites, Dog &dog)
     dog.sprite->h = 94;
     dog.sprite->w = 114;
     dog.sprite->x = 0;
-    dog.sprite->y = SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 4;
+    dog.sprite->y = 590 - dog.sprite->h / 2; //590 = position où doit être le chien sur l'écran
 
     dog.sprite->rect_src = new SDL_Rect;
     dog.sprite->rect_src->h = dog.sprite->h;
@@ -23,8 +23,8 @@ void initDog(SDL_Surface* entity_sprites, Dog &dog)
     dog.sprite->rect_dst = new SDL_Rect;
     dog.sprite->rect_dst->h = dog.sprite->h;
     dog.sprite->rect_dst->w = dog.sprite->w;
-    dog.sprite->rect_dst->x = dog.sprite->x;
-    dog.sprite->rect_dst->y = dog.sprite->y;
+    dog.sprite->rect_dst->x = dog.sprite->x - dog.sprite->w / 2;
+    dog.sprite->rect_dst->y = dog.sprite->y - dog.sprite->h / 2;
 }
 
 void moveDog(Dog &dog)
@@ -59,6 +59,8 @@ void changeDogAnimation(Dog &dog, int anim_type)
             dog.sprite->rect_src->y = 110;
             dog.sprite->h = 120;
             dog.sprite->w = 114;
+            dog.sprite->rect_src->h = dog.sprite->h;
+            dog.sprite->rect_src->w = dog.sprite->w;
             break;
 
         case 2: //jumping 1
@@ -67,6 +69,8 @@ void changeDogAnimation(Dog &dog, int anim_type)
             dog.sprite->rect_src->y = 110;
             dog.sprite->h = 110;
             dog.sprite->w = 75;
+            dog.sprite->rect_src->h = dog.sprite->h;
+            dog.sprite->rect_src->w = dog.sprite->w;
             break;
 
         case 3: //jumping 2
@@ -75,6 +79,8 @@ void changeDogAnimation(Dog &dog, int anim_type)
             dog.sprite->rect_src->y = 110;
             dog.sprite->h = 110;
             dog.sprite->w = 75;
+            dog.sprite->rect_src->h = dog.sprite->h;
+            dog.sprite->rect_src->w = dog.sprite->w;
             break;
     }
 }
