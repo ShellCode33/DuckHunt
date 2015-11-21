@@ -19,7 +19,4 @@ void moveDuck(Duck &duck);
 void showDuck(SDL_Surface *screen, Duck &duck);
 void deleteDuck(Duck &duck);
 
-
-
-
 #endif

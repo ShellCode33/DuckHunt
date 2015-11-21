@@ -6,10 +6,20 @@
 #include "duck.h"
 #include "menu.h"
 
+#include <string>
+using namespace std;
+
 enum Display
 {
     MENU,
     GAME
+};
+
+enum GameState
+{
+    DOG,
+    LEVEL,
+    DUCK
 };
 
 void processDog(SDL_Surface *screen, Dog &dog);

@@ -31,9 +31,10 @@ int main()
 
     //-------------------- init variables ------------------------
 
-    bool gameStarting = true;
+    int level = 1; //niveau courant en commencant la partie
 
-    Display display = MENU;
+    Display display = GAME;
+    GameState gs = DOG;
 
     SDL_Surface* entity_sprites = loadImageWithColorKey("res/sprites/duck.png", true, 228, 255, 0);
     SDL_Surface* background = loadImageWithColorKey("res/sprites/backGame.png", false, 0, 0, 0);
@@ -128,16 +129,45 @@ int main()
             {
                 SDL_BlitSurface(background, NULL, screen, &dst_background); //on affiche l'image de fond
 
-                if(gameStarting)
+                switch(gs) //GameState
                 {
-                    processDog(screen, dog);
+                    case DOG: //display dog
+                    {
+                        processDog(screen, dog);
 
-                    if(!dog.isComing && !dog.isWaiting && !dog.isJumping)
-                        gameStarting = false;
+                        if(!dog.isComing && !dog.isWaiting && !dog.isJumping)
+                            gs = LEVEL;
+
+                        break;
+                    }
+
+                    case LEVEL: //display level n°
+                    {
+                        printf("Display level...\n");
+
+                        //display font
+                        SDL_Color color = {0, 193, 255};
+                        string text = "Level ";
+                        text += to_string(level);
+
+                        SDL_Surface *text_level = TTF_RenderText_Shaded(small_font, text.c_str(), blackcolor, color);
+
+                        SDL_Rect text_rect;
+                        text_rect.w = text_level->w;
+                        text_rect.h = text_level->h;
+                        text_rect.x = (SCREEN_WIDTH - text_level->w) / 2;
+                        text_rect.y = (SCREEN_HEIGHT - text_level->h) / 3;
+
+                        SDL_BlitSurface(text_level, NULL, screen, &text_rect);
+                        break;
+                    }
+
+                    case DUCK: //display the game with ducks
+                    {
+                        processDuck(screen, duck);
+                        break;
+                    }
                 }
-
-                else
-                    processDuck(screen, duck);
 
                 break;
             }

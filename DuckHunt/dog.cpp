@@ -25,6 +25,9 @@ void initDog(SDL_Surface* entity_sprites, Dog &dog)
     dog.sprite->rect_dst->w = dog.sprite->w;
     dog.sprite->rect_dst->x = dog.sprite->x - dog.sprite->w / 2;
     dog.sprite->rect_dst->y = dog.sprite->y - dog.sprite->h / 2;
+
+    dog.mvt_x = 0;
+    dog.mvt_y = 0;
 }
 
 void processDog(SDL_Surface *screen, Dog &dog)
