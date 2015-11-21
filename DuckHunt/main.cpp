@@ -1,7 +1,12 @@
 #include "main.h"
 
-int main()
+int main(int argc, char **argv)
 {
+    if(argc == 2)
+    {
+        //easter egg ?
+    }
+
     // initialize SDL video
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -28,12 +33,15 @@ int main()
     }
 
     srand(time(NULL)); //Initialise la generation aleatoire
+    SDL_ShowCursor(SDL_DISABLE); //cache le curseur
 
     //-------------------- init variables ------------------------
 
+    int score = 0;
     int level = 1; //niveau courant en commencant la partie
+    int bullet_left = 3;
 
-    Display display = GAME;
+    Display display = MENU;
     GameState gs = DOG;
 
     SDL_Surface* entity_sprites = loadImageWithColorKey("res/sprites/duck.png", true, 228, 255, 0);
@@ -42,10 +50,15 @@ int main()
 
     SDL_Surface* menu_img = loadImageWithColorKey("res/sprites/menu.png", false, 0, 0, 0);
 
+    SDL_Surface* cursor_img = loadImageWithColorKey("res/sprites/viseur.png", true, 0, 0, 0);
 
+    SDL_Surface* bullet_img = loadImageWithColorKey("res/sprites/shot.png", true, 255, 255, 255);
+
+
+    TTF_Font* vsmall_font = TTF_OpenFont("res/font/duck_hunt.ttf", 30);
     TTF_Font* small_font = TTF_OpenFont("res/font/duck_hunt.ttf", 65);
     TTF_Font* big_font = TTF_OpenFont("res/font/duck_hunt.ttf", 90);
-    SDL_Color blackcolor = {0,0,0};
+    SDL_Color blackcolor = {0, 0, 0, 0};
 
     Button singleplayer;
     singleplayer.surface = TTF_RenderText_Solid(small_font, "Play", blackcolor);
@@ -100,15 +113,18 @@ int main()
                 }
             } // end switch
 
-            switch(detectMouseMenu(singleplayer, quit, event))
+            if(display == MENU)
             {
-                case 1:
-                    display = GAME;
-                    break;
+                switch(detectMouseMenu(singleplayer, quit, event))
+                {
+                    case 1:
+                        display = GAME;
+                        break;
 
-                case -1: //quitter
-                    done = true;
-                    break;
+                    case -1: //quitter
+                        done = true;
+                        break;
+                }
             }
         } // end of message processing
 
@@ -143,10 +159,8 @@ int main()
 
                     case LEVEL: //display level n°
                     {
-                        printf("Display level...\n");
-
                         //display font
-                        SDL_Color color = {0, 193, 255};
+                        SDL_Color color = {0, 193, 255, 0};
                         string text = "Level ";
                         text += to_string(level);
 
@@ -159,12 +173,44 @@ int main()
                         text_rect.y = (SCREEN_HEIGHT - text_level->h) / 3;
 
                         SDL_BlitSurface(text_level, NULL, screen, &text_rect);
+
+                        gs = DUCK;
+                        SDL_Flip(screen);
+                        SDL_Delay(2000); //On peut se permettre de faire ca, car durant l'affichage du niveau, l'utilsateur ne peut rien faire
                         break;
                     }
 
                     case DUCK: //display the game with ducks
                     {
                         processDuck(screen, duck);
+
+                        //Gestion du curseur
+                        int x_mouse, y_mouse;
+                        SDL_GetMouseState(&x_mouse, &y_mouse);
+
+                        SDL_Rect cursor_pos;
+                        cursor_pos.x = x_mouse - cursor_img->w / 2;
+                        cursor_pos.y = y_mouse - cursor_img->h / 2;
+                        cursor_pos.h = cursor_img->h;
+                        cursor_pos.w = cursor_img->w;
+
+                        SDL_BlitSurface(cursor_img, NULL, screen, &cursor_pos); //on affiche l'image de la cible à la position de la souris
+                        //------------------
+
+                        //Afficher les infos "balles restantes" "score" et "canards tués ou non"
+
+                        displayBulletLeft(screen, bullet_img, bullet_left);
+                        bullet_left++;
+                        bullet_left %= 4;
+
+                        displayScore(screen, vsmall_font, score);
+                        score++;
+                        score %= 99999;
+
+                        //displayDuckHit();
+
+                        //----------------------------------------------------------------------
+
                         break;
                     }
                 }
@@ -182,9 +228,14 @@ int main()
 
     TTF_CloseFont(small_font);
     TTF_CloseFont(big_font);
+    SDL_FreeSurface(entity_sprites);
+    SDL_FreeSurface(menu_img);
+    SDL_FreeSurface(cursor_img);
+    SDL_FreeSurface(bullet_img);
     SDL_FreeSurface(background);
-    SDL_FreeSurface(dog.sprite->img);
+    SDL_FreeSurface(fake_background);
     deleteDog(dog);
+    deleteDuck(duck);
     SDL_Quit();
 
     // all is well ;)

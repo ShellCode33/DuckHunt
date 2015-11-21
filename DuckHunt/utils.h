@@ -12,6 +12,8 @@
 #include <SDL/SDL_ttf.h>
 #include <time.h>
 #include <stdio.h>
+#include <string>
+using namespace std;
 
 #define SCREEN_WIDTH 750
 #define SCREEN_HEIGHT 761
@@ -37,5 +39,7 @@ struct Button
 };
 
 SDL_Surface* loadImageWithColorKey(const char* filename, bool colorkey, int r, int g, int b);
+void displayBulletLeft(SDL_Surface *screen, SDL_Surface *bullet_img, int bullet_left);
+void displayScore(SDL_Surface *screen, TTF_Font* font, int score);
 
 #endif

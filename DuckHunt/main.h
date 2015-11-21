@@ -6,9 +6,6 @@
 #include "duck.h"
 #include "menu.h"
 
-#include <string>
-using namespace std;
-
 enum Display
 {
     MENU,
