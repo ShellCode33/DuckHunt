@@ -38,6 +38,7 @@ int main(int argc, char **argv)
     //-------------------- init variables ------------------------
 
     int score = 0;
+    int current_wave = 1; //contient la vague courrante, 1 vague = 2 canards, il y a 5 vagues par niveau
     int level = 1; //niveau courant en commencant la partie
     int bullet_left = 3;
 
@@ -53,6 +54,8 @@ int main(int argc, char **argv)
     SDL_Surface* cursor_img = loadImageWithColorKey("res/sprites/viseur.png", true, 0, 0, 0);
 
     SDL_Surface* bullet_img = loadImageWithColorKey("res/sprites/shot.png", true, 255, 255, 255);
+
+    SDL_Surface* duck_hit_img = loadImageWithColorKey("res/sprites/hit.png", true, 5, 5, 5);
 
 
     TTF_Font* vsmall_font = TTF_OpenFont("res/font/duck_hunt.ttf", 30);
@@ -80,8 +83,8 @@ int main(int argc, char **argv)
     Dog dog;
     initDog(entity_sprites, dog);
 
-    Duck duck;
-    initDuck(entity_sprites, duck);
+    Duck duck[NB_DUCK_PER_LEVEL]; //tableau de cannards (10 par niveau)
+    initDuck(entity_sprites, duck[0]);
 
     //------------------------------------------------------------
 
@@ -182,7 +185,7 @@ int main(int argc, char **argv)
 
                     case DUCK: //display the game with ducks
                     {
-                        processDuck(screen, duck);
+                        processDuck(screen, duck[0]);
 
                         //Gestion du curseur
                         int x_mouse, y_mouse;
@@ -207,7 +210,8 @@ int main(int argc, char **argv)
                         score++;
                         score %= 99999;
 
-                        //displayDuckHit();
+                        //TODO
+                        displayDuckHit(screen, duck, current_wave, duck_hit_img);
 
                         //----------------------------------------------------------------------
 
@@ -235,7 +239,11 @@ int main(int argc, char **argv)
     SDL_FreeSurface(background);
     SDL_FreeSurface(fake_background);
     deleteDog(dog);
-    deleteDuck(duck);
+
+    int i;
+    for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
+        deleteDuck(duck[i]);
+
     SDL_Quit();
 
     // all is well ;)

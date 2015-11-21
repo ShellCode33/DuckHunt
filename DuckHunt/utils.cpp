@@ -58,3 +58,29 @@ void displayScore(SDL_Surface *screen, TTF_Font *font, int score)
 
     SDL_BlitSurface(text_score, NULL, screen, &rect_dst);
 }
+
+void displayDuckHit(SDL_Surface *screen, Duck duck[], int current_wave, SDL_Surface *duck_hit_img)
+{
+    int i;
+    for(i = 0; i < current_wave-1; i++)
+    {
+        if(duck[i].dead)
+            ; //green duck
+
+        else
+            ; //red duck
+    }
+
+
+    for(; i < current_wave*2; i++)
+    {
+        if(duck[i].dead)
+            ;//display green duck
+
+        else
+            ;
+    }
+
+    for(; i < NB_DUCK_PER_LEVEL; i++)
+        ; //display grey duck
+}
