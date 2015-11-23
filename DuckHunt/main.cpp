@@ -85,6 +85,7 @@ int main(int argc, char **argv)
 
     Duck duck[NB_DUCK_PER_LEVEL]; //tableau de cannards (10 par niveau)
     initDuck(entity_sprites, duck[0]);
+    initDuck(entity_sprites, duck[1]);
 
     //------------------------------------------------------------
 
@@ -186,6 +187,7 @@ int main(int argc, char **argv)
                     case DUCK: //display the game with ducks
                     {
                         processDuck(screen, duck[0]);
+                        processDuck(screen, duck[1]);
 
                         //Gestion du curseur
                         int x_mouse, y_mouse;

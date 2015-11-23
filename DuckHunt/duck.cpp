@@ -22,7 +22,7 @@ void initDuck(SDL_Surface* entity_sprites, Duck &duck)
     duck.sprite->rect_dst->x = duck.sprite->x;
     duck.sprite->rect_dst->y = duck.sprite->y;
 
-    duck.mvt_x=5;
+    duck.mvt_x=rand()%6+1; //A faire !!
     duck.mvt_y=5;
     duck.collision=false;
 }
@@ -32,13 +32,22 @@ void processDuck(SDL_Surface *screen, Duck &duck)
     if (duck.sprite->x>(SCREEN_WIDTH-duck.sprite->w/2))
     {
         duck.mvt_x*=-1;
+    }
+
+    else if (duck.sprite->x<duck.sprite->w/2)
+    {
+        duck.mvt_x*=-1;
+    }
+
+    else if (duck.sprite->y>SCREEN_HEIGHT/2 + 120 -duck.sprite->h/2)
+    {
         duck.mvt_y*=-1;
     }
 
-//    else if(1)
-//    {
-//    ;
-//    }
+    else if (duck.sprite->y<duck.sprite->h/2)
+    {
+        duck.mvt_y*=-1;
+    }
 
     moveDuck(duck);
     showDuck(screen, duck);
