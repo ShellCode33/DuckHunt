@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     }
 
     srand(time(NULL)); //Initialise la generation aleatoire
-    SDL_ShowCursor(SDL_DISABLE); //cache le curseur
+    //SDL_ShowCursor(SDL_DISABLE); //cache le curseur
 
     //-------------------- init variables ------------------------
 

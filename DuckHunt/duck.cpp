@@ -22,8 +22,17 @@ void initDuck(SDL_Surface* entity_sprites, Duck &duck)
     duck.sprite->rect_dst->x = duck.sprite->x;
     duck.sprite->rect_dst->y = duck.sprite->y;
 
-    duck.mvt_x=rand()%6+1; //A faire !!
-    duck.mvt_y=5;
+    int trajectoires[] = {-6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6};
+    int direction[]= {-1, 1};
+
+    duck.mvt_x=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[rand()%sizeof(direction)/sizeof(int)];
+
+    if (duck.mvt_x > 0)
+        duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7-duck.mvt_x);
+
+    else if (duck.mvt_x < 0)
+        duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7+duck.mvt_x);
+
     duck.collision=false;
 }
 
@@ -52,7 +61,7 @@ void processDuck(SDL_Surface *screen, Duck &duck)
     moveDuck(duck);
     showDuck(screen, duck);
 
-    SDL_Delay(20);
+    SDL_Delay(15);
 }
 
 void moveDuck(Duck &duck)
