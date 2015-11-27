@@ -45,6 +45,7 @@ struct Duck
     Sprite *sprite;
     float speed;      //vitesse du canard
     int nbr_sprite; //nbr d'images qui va composer l'animation
+    int type;
     int mvt_x;
     int mvt_y;
     bool collision;

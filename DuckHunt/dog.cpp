@@ -143,6 +143,10 @@ void changeDogAnimation(Dog &dog, int anim_type)
             dog.sprite->rect_src->h = dog.sprite->h;
             dog.sprite->rect_src->w = dog.sprite->w;
             break;
+
+        case 4: //showing ducks
+
+            break;
     }
 }
 
