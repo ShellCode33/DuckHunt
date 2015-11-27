@@ -33,12 +33,12 @@ int main(int argc, char **argv)
     }
 
     srand(time(NULL)); //Initialise la generation aleatoire
-    //SDL_ShowCursor(SDL_DISABLE); //cache le curseur
 
     //-------------------- init variables ------------------------
 
     int score = 0;
     int current_wave = 1; //contient la vague courrante, 1 vague = 2 canards, il y a 5 vagues par niveau
+    bool wave_finished = true; //Permet de savoir quand afficher le chien qui rigole ou alors celui avec les canards dans la/les main(s)
     int level = 1; //niveau courant en commencant la partie
     int bullet_left = 3;
 
@@ -84,8 +84,10 @@ int main(int argc, char **argv)
     initDog(entity_sprites, dog);
 
     Duck duck[NB_DUCK_PER_LEVEL]; //tableau de cannards (10 par niveau)
-    initDuck(entity_sprites, duck[0]);
-    initDuck(entity_sprites, duck[1]);
+
+    int i;
+    for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
+        initDuck(entity_sprites, duck[i]);
 
     //------------------------------------------------------------
 
@@ -123,6 +125,7 @@ int main(int argc, char **argv)
                 {
                     case 1:
                         display = GAME;
+                        SDL_ShowCursor(SDL_DISABLE); //cache le curseur
                         break;
 
                     case -1: //quitter
@@ -155,8 +158,11 @@ int main(int argc, char **argv)
                     {
                         processDog(screen, dog);
 
-                        if(!dog.isComing && !dog.isWaiting && !dog.isJumping)
+                        if(!dog.state)
                             gs = LEVEL;
+
+                        if(dog.state == 4 || dog.state == 5)
+                            SDL_BlitSurface(fake_background, NULL, screen, &dst_background); //on affiche l'image de fond
 
                         break;
                     }
@@ -180,14 +186,14 @@ int main(int argc, char **argv)
 
                         gs = DUCK;
                         SDL_Flip(screen);
-                        SDL_Delay(2000); //On peut se permettre de faire ca, car durant l'affichage du niveau, l'utilsateur ne peut rien faire
+                        SDL_Delay(2000); //On peut se permettre de faire ca, car durant l'affichage du niveau, l'utilisateur ne peut rien faire
                         break;
                     }
 
                     case DUCK: //display the game with ducks
                     {
-                        processDuck(screen, duck[0]);
-                        processDuck(screen, duck[1]);
+                        processDuck(screen, duck[current_wave-1]);
+                        processDuck(screen, duck[current_wave]);
 
                         //Gestion du curseur
                         int x_mouse, y_mouse;
@@ -205,15 +211,33 @@ int main(int argc, char **argv)
                         //Afficher les infos "balles restantes" "score" et "canards tués ou non"
 
                         displayBulletLeft(screen, bullet_img, bullet_left);
-                        bullet_left++;
-                        bullet_left %= 4;
 
                         displayScore(screen, vsmall_font, score);
                         score++;
                         score %= 99999;
 
-                        //TODO
                         displayDuckHit(screen, duck, current_wave, duck_hit_img);
+
+                        if(wave_finished)
+                        {
+                            //si des canards ont été tués
+                            changeDogAnimation(dog, 4);
+                            dog.state = 4;
+
+                            //sinon
+                            changeDogAnimation(dog, 5);
+                            dog.state = 5;
+
+                            //TODO
+                            /*
+
+                              il faut tester les types des canards qui ont été tués afin d'ajuster le Rect_Src.x en conséquence
+
+                             */
+
+                            gs = DOG;
+                            //wave_finished = false;
+                        }
 
                         //----------------------------------------------------------------------
 
@@ -242,7 +266,6 @@ int main(int argc, char **argv)
     SDL_FreeSurface(fake_background);
     deleteDog(dog);
 
-    int i;
     for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
         deleteDuck(duck[i]);
 

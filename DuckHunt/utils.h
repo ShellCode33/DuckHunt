@@ -27,6 +27,7 @@ struct Sprite
     int y;
     int w;
     int h;
+    int x_src; //Origine/Début de l'animation
     SDL_Surface *img;
     SDL_Rect *rect_src;
     SDL_Rect *rect_dst;
@@ -58,9 +59,7 @@ struct Dog
     int nbr_sprite;
     int mvt_x;
     int mvt_y;
-    bool isComing; //En début de jeu, lorsque le chien arrive
-    bool isJumping; //Lorsque le chien arrive au milieu de l'écran, il va sauter dans l'herbe; ce boolean est donc définit pour
-    bool isWaiting;
+    int state; //1 = isComing  2 = isJumping 3 = isWaiting 4 = isShowingDucks
     int cooldown; //cooldown utilisé à plusieurs moments afin de faire attendre le chien
 };
 
