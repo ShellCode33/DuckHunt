@@ -145,7 +145,7 @@ void changeDogAnimation(Dog &dog, int anim_type)
             break;
 
         case 4: //showing ducks
-
+            dog.nbr_sprite = 1;
             break;
     }
 }
