@@ -7,8 +7,8 @@ void initDuck(SDL_Surface* entity_sprites, Duck &duck)
     duck.nbr_sprite = 3;
     duck.sprite->h = 68;
     duck.sprite->w = 68;
-    duck.sprite->x = SCREEN_WIDTH/2;//rand() % (SCREEN_WIDTH - duck.sprite->w);
-    duck.sprite->y = SCREEN_HEIGHT/2;//rand() % (SCREEN_HEIGHT - duck.sprite->h);
+    duck.sprite->x = rand() % (SCREEN_WIDTH - duck.sprite->w);
+    duck.sprite->y = rand() % (SCREEN_HEIGHT/2 + 120 -duck.sprite->h/2);
 
     duck.sprite->rect_src = new SDL_Rect;
     duck.sprite->rect_src->h = duck.sprite->h;
@@ -25,6 +25,7 @@ void initDuck(SDL_Surface* entity_sprites, Duck &duck)
     duck.speed = 1.0;
 
     duck.dead = false;
+
     bool colTopBottom = false; //colllision en haut et en bas de l'ecran
     bool colLeftRight = false; //collision a gauche et a droite de l'ecran
 
@@ -75,6 +76,7 @@ void duckRandTrajectory (Duck &duck, bool colTopBottom, bool colLeftRight)
             duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7+duck.mvt_x);
     }
 }
+
 void processDuck(SDL_Surface *screen, Duck &duck)
 {
     bool colTopBottom = false; //colllision en haut et en bas de l'ecran
@@ -84,7 +86,6 @@ void processDuck(SDL_Surface *screen, Duck &duck)
     {
         colTopBottom = false;
         colLeftRight = true;
-//        duck.mvt_x*=-1;
         duckRandTrajectory(duck, colTopBottom, colLeftRight);
     }
 
@@ -92,7 +93,6 @@ void processDuck(SDL_Surface *screen, Duck &duck)
     {
         colTopBottom = false;
         colLeftRight = true;
-//        duck.mvt_x*=-1;
         duckRandTrajectory(duck, colTopBottom, colLeftRight);
     }
 
@@ -100,7 +100,6 @@ void processDuck(SDL_Surface *screen, Duck &duck)
     {
         colTopBottom = true;
         colLeftRight = false;
-//        duck.mvt_y*=-1;
         duckRandTrajectory(duck, colTopBottom, colLeftRight);
     }
 
@@ -108,7 +107,6 @@ void processDuck(SDL_Surface *screen, Duck &duck)
     {
         colTopBottom = true;
         colLeftRight = false;
-//        duck.mvt_y*=-1;
         duckRandTrajectory(duck, colTopBottom, colLeftRight);
     }
 
@@ -116,6 +114,13 @@ void processDuck(SDL_Surface *screen, Duck &duck)
     showDuck(screen, duck);
 
     SDL_Delay(15);
+}
+
+void killDuck(Duck &duck, SDL_Event &event)
+{
+    if (event.motion.x < duck.sprite->x + duck.sprite->w/2 && event.motion.x > duck.sprite->x - duck.sprite->w/2 && event.motion.y < duck.sprite->y + duck.sprite->h/2 && event.motion.y > duck.sprite->y - duck.sprite->h/2)
+        if (event.type == SDL_MOUSEBUTTONDOWN)
+            duck.dead =true;
 }
 
 void moveDuck(Duck &duck)
@@ -130,12 +135,15 @@ void moveDuck(Duck &duck)
 
 void showDuck(SDL_Surface *screen, Duck &duck)
 {
-    SDL_BlitSurface(duck.sprite->img, duck.sprite->rect_src, screen, duck.sprite->rect_dst);
-
-    if (duck.nbr_sprite>1)
+    if (!duck.dead)
     {
-        duck.sprite->rect_src->x += duck.sprite->w;
-        duck.sprite->rect_src->x %= (duck.sprite->w * duck.nbr_sprite);
+        SDL_BlitSurface(duck.sprite->img, duck.sprite->rect_src, screen, duck.sprite->rect_dst);
+
+        if (duck.nbr_sprite>1)
+        {
+            duck.sprite->rect_src->x += duck.sprite->w;
+            duck.sprite->rect_src->x %= (duck.sprite->w * duck.nbr_sprite);
+        }
     }
 }
 
