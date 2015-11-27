@@ -22,40 +22,94 @@ void initDuck(SDL_Surface* entity_sprites, Duck &duck)
     duck.sprite->rect_dst->x = duck.sprite->x;
     duck.sprite->rect_dst->y = duck.sprite->y;
 
-    int trajectoires[] = {-6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6};
-    int direction[]= {-1, 1};
+    duck.speed = 1.0;
 
-    duck.mvt_x=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[rand()%sizeof(direction)/sizeof(int)];
+    duck.dead = false;
+    bool colTopBottom = false; //colllision en haut et en bas de l'ecran
+    bool colLeftRight = false; //collision a gauche et a droite de l'ecran
 
-    if (duck.mvt_x > 0)
-        duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7-duck.mvt_x);
-
-    else if (duck.mvt_x < 0)
-        duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7+duck.mvt_x);
-
-    duck.collision=false;
+    duckRandTrajectory(duck, colTopBottom, colLeftRight);
 }
 
+void duckRandTrajectory (Duck &duck, bool colTopBottom, bool colLeftRight)
+{
+    int trajectoires[] = {1, 2, 3, 4, 5, 6};
+    int direction[]= {-1, 1};
+
+    if (colLeftRight)
+    {
+        if (duck.sprite->x > SCREEN_WIDTH/2)
+        {
+            duck.mvt_x=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[0];
+            duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7+duck.mvt_x);
+        }
+        else if (duck.sprite->x < SCREEN_WIDTH/2)
+        {
+            duck.mvt_x=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[1];
+            duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7-duck.mvt_x);
+        }
+    }
+
+    else if (colTopBottom)
+    {
+        if (duck.sprite->y > SCREEN_HEIGHT/3)
+        {
+            duck.mvt_y=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[0];
+            duck.mvt_x=direction[rand()%sizeof(direction)/sizeof(int)]*(7+duck.mvt_y);
+        }
+        else if (duck.sprite->y < SCREEN_HEIGHT/2)
+        {
+            duck.mvt_y=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[1];
+            duck.mvt_x=direction[rand()%sizeof(direction)/sizeof(int)]*(7-duck.mvt_y);
+        }
+    }
+
+    else if (!colTopBottom && !colLeftRight)
+    {
+        duck.mvt_x=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[rand()%sizeof(direction)/sizeof(int)];
+
+        if (duck.mvt_x > 0)
+            duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7-duck.mvt_x);
+
+        else if (duck.mvt_x < 0)
+            duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7+duck.mvt_x);
+    }
+}
 void processDuck(SDL_Surface *screen, Duck &duck)
 {
+    bool colTopBottom = false; //colllision en haut et en bas de l'ecran
+    bool colLeftRight = false; //collision a gauche et a droite de l'ecran
+
     if (duck.sprite->x>(SCREEN_WIDTH-duck.sprite->w/2))
     {
-        duck.mvt_x*=-1;
+        colTopBottom = false;
+        colLeftRight = true;
+//        duck.mvt_x*=-1;
+        duckRandTrajectory(duck, colTopBottom, colLeftRight);
     }
 
     else if (duck.sprite->x<duck.sprite->w/2)
     {
-        duck.mvt_x*=-1;
+        colTopBottom = false;
+        colLeftRight = true;
+//        duck.mvt_x*=-1;
+        duckRandTrajectory(duck, colTopBottom, colLeftRight);
     }
 
     else if (duck.sprite->y>SCREEN_HEIGHT/2 + 120 -duck.sprite->h/2)
     {
-        duck.mvt_y*=-1;
+        colTopBottom = true;
+        colLeftRight = false;
+//        duck.mvt_y*=-1;
+        duckRandTrajectory(duck, colTopBottom, colLeftRight);
     }
 
     else if (duck.sprite->y<duck.sprite->h/2)
     {
-        duck.mvt_y*=-1;
+        colTopBottom = true;
+        colLeftRight = false;
+//        duck.mvt_y*=-1;
+        duckRandTrajectory(duck, colTopBottom, colLeftRight);
     }
 
     moveDuck(duck);
@@ -66,8 +120,8 @@ void processDuck(SDL_Surface *screen, Duck &duck)
 
 void moveDuck(Duck &duck)
 {
-    duck.sprite->x += duck.mvt_x;
-    duck.sprite->y += duck.mvt_y;
+    duck.sprite->x += duck.mvt_x * duck.speed;
+    duck.sprite->y += duck.mvt_y * duck.speed;
 
     duck.sprite->rect_dst->x = duck.sprite->x - duck.sprite->w / 2;
     duck.sprite->rect_dst->y = duck.sprite->y - duck.sprite->h / 2;
