@@ -61,26 +61,58 @@ void displayScore(SDL_Surface *screen, TTF_Font *font, int score)
 
 void displayDuckHit(SDL_Surface *screen, Duck duck[], int current_wave, SDL_Surface *duck_hit_img)
 {
+    SDL_Rect dst_rect, src_rect;
+    src_rect.x = 9;
+    src_rect.y = 8;
+    src_rect.w = 21;
+    src_rect.h = 21;
+
+    dst_rect.x = 190;
+    dst_rect.y = 660;
+    dst_rect.w = 21;
+    dst_rect.h = 21;
+
     int i;
-    for(i = 0; i < current_wave-1; i++)
+    for(i = 0; i < (current_wave-1)*2; i++)
     {
         if(duck[i].dead)
-            ; //green duck
+        {
+            src_rect.x = 9 + 2*src_rect.w + 6;
+            SDL_BlitSurface(duck_hit_img, &src_rect, screen, &dst_rect); //green duck
+        }
 
         else
-            ; //red duck
+        {
+            src_rect.x = 9 + src_rect.w + 3;
+            SDL_BlitSurface(duck_hit_img, &src_rect, screen, &dst_rect); //red duck
+        }
+
+        dst_rect.x += dst_rect.w + 3;;
     }
 
 
     for(; i < current_wave*2; i++)
     {
         if(duck[i].dead)
-            ;//display green duck
+        {
+            src_rect.x = 9 + 2*src_rect.w + 6;
+            SDL_BlitSurface(duck_hit_img, &src_rect, screen, &dst_rect); //green duck
+        }
 
         else
-            ;
+        {
+            src_rect.x = 9;
+            SDL_BlitSurface(duck_hit_img, &src_rect, screen, &dst_rect); //display white duck
+        }
+
+        dst_rect.x += dst_rect.w + 3;
     }
 
+    src_rect.x = 9;
+
     for(; i < NB_DUCK_PER_LEVEL; i++)
-        ; //display grey duck
+    {
+        SDL_BlitSurface(duck_hit_img, &src_rect, screen, &dst_rect); //display white duck
+        dst_rect.x += dst_rect.w + 3;
+    }
 }
