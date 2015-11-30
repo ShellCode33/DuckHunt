@@ -51,6 +51,7 @@ struct Duck
     int mvt_y;
     bool collision;
     bool dead; //utilisé pour l'affichage tués dans la barre en bas de l'écran
+    int cooldown;
 };
 
 struct Dog
