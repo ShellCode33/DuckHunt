@@ -5,6 +5,8 @@ void initDuck(SDL_Surface* entity_sprites, Duck &duck)
     duck.sprite = new Sprite;
     duck.sprite->img = entity_sprites;
     duck.nbr_sprite = 3;
+    duck.cooldown = 11;
+    duck.sprite->x_src = 0;
     duck.sprite->h = 68;
     duck.sprite->w = 68;
     duck.sprite->x = rand() % (SCREEN_WIDTH - duck.sprite->w);
@@ -82,6 +84,12 @@ void processDuck(SDL_Surface *screen, Duck &duck)
     bool colTopBottom = false; //colllision en haut et en bas de l'ecran
     bool colLeftRight = false; //collision a gauche et a droite de l'ecran
 
+    if(duck.dead && duck.cooldown > 0)
+        duck.cooldown--;
+
+    else if (duck.cooldown <= 0 )
+        changeDuckAnimation(duck, 2);
+
     if (duck.sprite->x>(SCREEN_WIDTH-duck.sprite->w/2))
     {
         colTopBottom = false;
@@ -96,7 +104,7 @@ void processDuck(SDL_Surface *screen, Duck &duck)
         duckRandTrajectory(duck, colTopBottom, colLeftRight);
     }
 
-    else if (duck.sprite->y>SCREEN_HEIGHT/2 + 120 -duck.sprite->h/2)
+    else if (duck.sprite->y>SCREEN_HEIGHT/2 + 120 -duck.sprite->h/2 && !duck.dead)
     {
         colTopBottom = true;
         colLeftRight = false;
@@ -116,11 +124,17 @@ void processDuck(SDL_Surface *screen, Duck &duck)
     SDL_Delay(15);
 }
 
-void killDuck(Duck &duck, SDL_Event &event)
+void killDuck(Duck &duck, SDL_Event &event, int &bullet_left)
 {
-    if (event.motion.x < duck.sprite->x + duck.sprite->w/2 && event.motion.x > duck.sprite->x - duck.sprite->w/2 && event.motion.y < duck.sprite->y + duck.sprite->h/2 && event.motion.y > duck.sprite->y - duck.sprite->h/2)
-        if (event.type == SDL_MOUSEBUTTONDOWN)
-            duck.dead =true;
+    if(event.motion.x < duck.sprite->x + duck.sprite->w/2 && event.motion.x > duck.sprite->x - duck.sprite->w/2 && event.motion.y < duck.sprite->y + duck.sprite->h/2 && event.motion.y > duck.sprite->y - duck.sprite->h/2)
+        duck.dead = true;
+
+    if (duck.dead)
+    {
+        duck.cooldown--;
+        if (duck.cooldown == 10 )
+            changeDuckAnimation(duck, 1);
+    }
 }
 
 void moveDuck(Duck &duck)
@@ -130,20 +144,44 @@ void moveDuck(Duck &duck)
 
     duck.sprite->rect_dst->x = duck.sprite->x - duck.sprite->w / 2;
     duck.sprite->rect_dst->y = duck.sprite->y - duck.sprite->h / 2;
-
 }
 
 void showDuck(SDL_Surface *screen, Duck &duck)
 {
-    if (!duck.dead)
-    {
         SDL_BlitSurface(duck.sprite->img, duck.sprite->rect_src, screen, duck.sprite->rect_dst);
 
         if (duck.nbr_sprite>1)
         {
             duck.sprite->rect_src->x += duck.sprite->w;
-            duck.sprite->rect_src->x %= (duck.sprite->w * duck.nbr_sprite);
+            duck.sprite->rect_src->x %= (duck.sprite->x_src + duck.sprite->w * duck.nbr_sprite);
+
+            if(duck.sprite->rect_src->x < duck.sprite->x_src)
+                duck.sprite->rect_src->x += duck.sprite->x_src;
         }
+}
+
+void changeDuckAnimation(Duck &duck, int anim_type)
+{
+    switch(anim_type)
+    {
+    case 1: //when the duck dies
+        duck.sprite->rect_src->x = 450;
+        duck.sprite->rect_src->y = 240;
+        duck.nbr_sprite = 1;
+        duck.sprite->x_src = 450;
+        duck.mvt_x = 0;
+        duck.mvt_y = 0;
+        break;
+
+    case 2: //when the duck falls
+        duck.nbr_sprite = 2;
+        duck.sprite->x_src = 538;
+        duck.sprite->rect_src->x = 538;
+        duck.sprite->rect_src->y = 246;
+        duck.sprite->w = 48;
+        duck.sprite->h = 62;
+        duck.mvt_y = 15;
+        break;
     }
 }
 
