@@ -169,9 +169,6 @@ int main(int argc, char **argv)
                         if(!dog.state)
                             gs = LEVEL;
 
-                        if(dog.state == 4 || dog.state == 5)
-                            SDL_BlitSurface(fake_background, NULL, screen, &dst_background); //on affiche l'image de fond
-
                         break;
                     }
 
@@ -252,6 +249,9 @@ int main(int argc, char **argv)
                         break;
                     }
                 }
+
+                if(dog.state != 1 && dog.state != 2 && dog.state != 3)
+                    SDL_BlitSurface(fake_background, NULL, screen, &dst_background); //on affiche l'image de fond
 
                 break;
             }

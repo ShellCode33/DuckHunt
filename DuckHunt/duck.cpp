@@ -93,6 +93,9 @@ void processDuck(SDL_Surface *screen, Duck &duck)
         duck.cooldown = -1; //on rend le cooldown inactif.
     }
 
+    else if (duck.dead && duck.sprite->y > SCREEN_HEIGHT - SCREEN_HEIGHT/4) //Si le canard est mort, il ne s'affiche plus à partir de l'herbe (d'où le return)
+        return;
+
     if (duck.sprite->x>(SCREEN_WIDTH-duck.sprite->w/2))
     {
         colTopBottom = false;
@@ -155,9 +158,6 @@ void showDuck(SDL_Surface *screen, Duck &duck)
 
         if (duck.nbr_sprite>1)
         {
-            if(duck.dead)
-                printf("Salam.\n");
-
             duck.sprite->rect_src->x += duck.sprite->w;
             duck.sprite->rect_src->x %= (duck.sprite->x_src + duck.sprite->w * duck.nbr_sprite);
 
