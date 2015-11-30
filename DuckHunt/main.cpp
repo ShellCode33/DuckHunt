@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 
     int score = 0;
     int current_wave = 1; //contient la vague courrante, 1 vague = 2 canards, il y a 5 vagues par niveau
-    bool wave_finished = true; //Permet de savoir quand afficher le chien qui rigole ou alors celui avec les canards dans la/les main(s)
+    bool wave_finished = false; //Permet de savoir quand afficher le chien qui rigole ou alors celui avec les canards dans la/les main(s)
     int level = 1; //niveau courant en commencant la partie
     int bullet_left = 3;
 
