@@ -87,8 +87,11 @@ void processDuck(SDL_Surface *screen, Duck &duck)
     if(duck.dead && duck.cooldown > 0)
         duck.cooldown--;
 
-    else if (duck.cooldown <= 0 )
+    else if(duck.dead && duck.cooldown == 0 )
+    {
         changeDuckAnimation(duck, 2);
+        duck.cooldown = -1; //on rend le cooldown inactif.
+    }
 
     if (duck.sprite->x>(SCREEN_WIDTH-duck.sprite->w/2))
     {
@@ -152,6 +155,9 @@ void showDuck(SDL_Surface *screen, Duck &duck)
 
         if (duck.nbr_sprite>1)
         {
+            if(duck.dead)
+                printf("Salam.\n");
+
             duck.sprite->rect_src->x += duck.sprite->w;
             duck.sprite->rect_src->x %= (duck.sprite->x_src + duck.sprite->w * duck.nbr_sprite);
 
@@ -175,11 +181,12 @@ void changeDuckAnimation(Duck &duck, int anim_type)
 
     case 2: //when the duck falls
         duck.nbr_sprite = 2;
-        duck.sprite->x_src = 538;
-        duck.sprite->rect_src->x = 538;
+        duck.sprite->x_src = duck.sprite->rect_src->x = 532;
         duck.sprite->rect_src->y = 246;
         duck.sprite->w = 48;
         duck.sprite->h = 62;
+        duck.sprite->rect_src->h = duck.sprite->h;
+        duck.sprite->rect_src->w = duck.sprite->w;
         duck.mvt_y = 15;
         break;
     }
