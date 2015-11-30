@@ -133,6 +133,14 @@ int main(int argc, char **argv)
                         break;
                 }
             }
+
+            else if(event.type == SDL_MOUSEBUTTONDOWN && display == GAME && gs == DUCK && bullet_left > 0)
+            {
+                killDuck(duck[current_wave-1], event, bullet_left);
+                killDuck(duck[current_wave], event, bullet_left);
+                bullet_left--;
+            }
+
         } // end of message processing
 
         // DRAWING STARTS HERE
