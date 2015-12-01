@@ -27,6 +27,7 @@ void initDuck(SDL_Surface* entity_sprites, Duck &duck)
     duck.speed = 1.0;
 
     duck.dead = false;
+    duck.displayed = true;
 
     bool colTopBottom = false; //colllision en haut et en bas de l'ecran
     bool colLeftRight = false; //collision a gauche et a droite de l'ecran
@@ -94,7 +95,10 @@ void processDuck(SDL_Surface *screen, Duck &duck)
     }
 
     else if (duck.dead && duck.sprite->y > SCREEN_HEIGHT - SCREEN_HEIGHT/4) //Si le canard est mort, il ne s'affiche plus à partir de l'herbe (d'où le return)
+    {
+        duck.displayed = false;
         return;
+    }
 
     if (duck.sprite->x>(SCREEN_WIDTH-duck.sprite->w/2))
     {
@@ -126,8 +130,6 @@ void processDuck(SDL_Surface *screen, Duck &duck)
 
     moveDuck(duck);
     showDuck(screen, duck);
-
-    SDL_Delay(15);
 }
 
 void killDuck(Duck &duck, SDL_Event &event, int &bullet_left)

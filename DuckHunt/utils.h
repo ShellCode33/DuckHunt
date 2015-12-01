@@ -49,7 +49,7 @@ struct Duck
     int type;
     int mvt_x;
     int mvt_y;
-    bool collision;
+    bool displayed; //si le canard est affiché à l'écran
     bool dead; //utilisé pour l'affichage tués dans la barre en bas de l'écran
     int cooldown;
 };

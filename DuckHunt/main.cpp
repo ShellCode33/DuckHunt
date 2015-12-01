@@ -174,7 +174,6 @@ int main(int argc, char **argv)
 
                     case LEVEL: //display level n°
                     {
-                        //display font
                         SDL_Color color = {0, 193, 255, 0};
                         string text = "Level ";
                         text += to_string(level);
@@ -192,6 +191,7 @@ int main(int argc, char **argv)
                         gs = DUCK;
                         SDL_Flip(screen);
                         SDL_Delay(2000); //On peut se permettre de faire ca, car durant l'affichage du niveau, l'utilisateur ne peut rien faire
+
                         break;
                     }
 
@@ -223,11 +223,21 @@ int main(int argc, char **argv)
 
                         displayDuckHit(screen, duck, current_wave, duck_hit_img);
 
+                        SDL_Delay(12);
+
+                        if(duck[current_wave].dead && duck[current_wave - 1].dead && !duck[current_wave].displayed && !duck[current_wave-1].displayed || bullet_left==0)
+                        {
+                            wave_finished = true; //passage à la vague de deux canards suivante
+                            current_wave += 2;
+                            bullet_left = 3;
+                        }
+
                         if(wave_finished)
                         {
-                            //si des canards ont été tués
-                            changeDogAnimation(dog, 4);
-                            dog.state = 4;
+                             //si des canards ont été tués
+                             changeDogAnimation(dog, 4);
+                             dog.state = 4;
+
 
                             //sinon
                             changeDogAnimation(dog, 5);
@@ -241,7 +251,8 @@ int main(int argc, char **argv)
                              */
 
                             gs = DOG;
-                            //wave_finished = false;
+                            wave_finished = false;
+                            ;
                         }
 
                         //----------------------------------------------------------------------
