@@ -166,7 +166,16 @@ int main(int argc, char **argv)
                     {
                         processDog(screen, dog);
 
-                        if(!dog.state)
+                        if(dog.state == 4 || dog.state == 5)
+                            gs = DUCK;
+
+                        else if(current_wave > 5)
+                        {
+                            current_wave = 1;
+                            gs = LEVEL;
+                        }
+
+                        else if(!dog.state)
                             gs = LEVEL;
 
                         break;
@@ -197,8 +206,8 @@ int main(int argc, char **argv)
 
                     case DUCK: //display the game with ducks
                     {
-                        processDuck(screen, duck[current_wave-1]);
-                        processDuck(screen, duck[current_wave]);
+                        processDuck(screen, duck[current_wave*2-2]);
+                        processDuck(screen, duck[current_wave*2-1]);
 
                         //Gestion du curseur
                         int x_mouse, y_mouse;
@@ -223,40 +232,45 @@ int main(int argc, char **argv)
 
                         displayDuckHit(screen, duck, current_wave, duck_hit_img);
 
-                        SDL_Delay(12);
-
-                        if(duck[current_wave].dead && duck[current_wave - 1].dead && !duck[current_wave].displayed && !duck[current_wave-1].displayed || bullet_left==0)
-                        {
-                            wave_finished = true; //passage à la vague de deux canards suivante
-                            current_wave += 2;
-                            bullet_left = 3;
-                        }
+                        //si les canards sont morts et plus à l'écran, alors la vague est terminée (ou s'il n'y a plus de balle)
+                        if((duck[current_wave*2-1].dead && duck[current_wave*2 - 2].dead && !duck[current_wave*2-1].displayed && !duck[current_wave*2-2].displayed) || !bullet_left)
+                            wave_finished = true;
 
                         if(wave_finished)
                         {
                              //si des canards ont été tués
-                             changeDogAnimation(dog, 4);
-                             dog.state = 4;
+                            if(duck[current_wave*2-1].dead || duck[current_wave*2-2].dead)
+                            {
+                                changeDogAnimation(dog, 4);
+                                dog.state = 4;
 
+                                //TODO
+                                /*
 
-                            //sinon
-                            changeDogAnimation(dog, 5);
-                            dog.state = 5;
+                                  il faut tester les types des canards qui ont été tués afin d'ajuster le Rect_Src.x en conséquence
 
-                            //TODO
-                            /*
+                                 */
+                            }
 
-                              il faut tester les types des canards qui ont été tués afin d'ajuster le Rect_Src.x en conséquence
+                            else
+                            {
+                                changeDogAnimation(dog, 5);
+                                dog.state = 5;
+                            }
 
-                             */
+                            current_wave++;
+                            bullet_left = 3;
+
+                            if(current_wave > 5)
+                                level++;
 
                             gs = DOG;
                             wave_finished = false;
-                            ;
                         }
 
                         //----------------------------------------------------------------------
 
+                        SDL_Delay(12);
                         break;
                     }
                 }
