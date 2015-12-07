@@ -132,7 +132,7 @@ void processDuck(SDL_Surface *screen, Duck &duck)
     showDuck(screen, duck);
 }
 
-void killDuck(Duck &duck, SDL_Event &event, int &bullet_left)
+bool killDuck(Duck &duck, SDL_Event &event)
 {
     if(event.motion.x < duck.sprite->x + duck.sprite->w/2 && event.motion.x > duck.sprite->x - duck.sprite->w/2 && event.motion.y < duck.sprite->y + duck.sprite->h/2 && event.motion.y > duck.sprite->y - duck.sprite->h/2)
         duck.dead = true;
@@ -143,6 +143,8 @@ void killDuck(Duck &duck, SDL_Event &event, int &bullet_left)
         if (duck.cooldown == 10 )
             changeDuckAnimation(duck, 1);
     }
+
+    return duck.dead;
 }
 
 void moveDuck(Duck &duck)

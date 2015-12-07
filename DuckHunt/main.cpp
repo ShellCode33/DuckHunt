@@ -39,6 +39,7 @@ int main(int argc, char **argv)
     int score = 0;
     int current_wave = 1; //contient la vague courrante, 1 vague = 2 canards, il y a 5 vagues par niveau
     bool wave_finished = false; //Permet de savoir quand afficher le chien qui rigole ou alors celui avec les canards dans la/les main(s)
+    bool new_level = true; //Permet de savoir si on démarre un nouveau niveau afin de ne pas afficher le niveau à chaque fin de wave
     int level = 1; //niveau courant en commencant la partie
     int bullet_left = 3;
 
@@ -136,8 +137,12 @@ int main(int argc, char **argv)
 
             else if(event.type == SDL_MOUSEBUTTONDOWN && display == GAME && gs == DUCK && bullet_left > 0)
             {
-                killDuck(duck[current_wave-1], event, bullet_left);
-                killDuck(duck[current_wave], event, bullet_left);
+                if(killDuck(duck[current_wave*2-1], event))
+                    score+=1000;
+
+                else if(killDuck(duck[current_wave*2-2], event))
+                    score+=1000;
+
                 bullet_left--;
             }
 
@@ -166,17 +171,11 @@ int main(int argc, char **argv)
                     {
                         processDog(screen, dog);
 
-                        if(dog.state == 4 || dog.state == 5)
-                            gs = DUCK;
-
-                        else if(current_wave > 5)
-                        {
-                            current_wave = 1;
+                        if(!dog.state && new_level)
                             gs = LEVEL;
-                        }
 
                         else if(!dog.state)
-                            gs = LEVEL;
+                            gs = DUCK;
 
                         break;
                     }
@@ -201,6 +200,8 @@ int main(int argc, char **argv)
                         SDL_Flip(screen);
                         SDL_Delay(2000); //On peut se permettre de faire ca, car durant l'affichage du niveau, l'utilisateur ne peut rien faire
 
+                        new_level = false;
+
                         break;
                     }
 
@@ -223,12 +224,9 @@ int main(int argc, char **argv)
                         //------------------
 
                         //Afficher les infos "balles restantes" "score" et "canards tués ou non"
-
                         displayBulletLeft(screen, bullet_img, bullet_left);
 
                         displayScore(screen, vsmall_font, score);
-                        score++;
-                        score %= 99999;
 
                         displayDuckHit(screen, duck, current_wave, duck_hit_img);
 
@@ -245,11 +243,7 @@ int main(int argc, char **argv)
                                 dog.state = 4;
 
                                 //TODO
-                                /*
-
-                                  il faut tester les types des canards qui ont été tués afin d'ajuster le Rect_Src.x en conséquence
-
-                                 */
+                                //il faut tester les types des canards qui ont été tués afin d'ajuster le Rect_Src.x en conséquence
                             }
 
                             else
@@ -261,8 +255,22 @@ int main(int argc, char **argv)
                             current_wave++;
                             bullet_left = 3;
 
+                            //on change de niveau
                             if(current_wave > 5)
+                            {
                                 level++;
+
+                                //reset ducks
+                                int i;
+                                for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
+                                    deleteDuck(duck[i]);
+
+                                for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
+                                    initDuck(entity_sprites, duck[i]);
+
+                                current_wave = 1;
+                                new_level = true;
+                            }
 
                             gs = DOG;
                             wave_finished = false;
