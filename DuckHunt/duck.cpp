@@ -192,8 +192,11 @@ void changeDuckAnimation(Duck &duck, int anim_type)
     switch(anim_type)
     {
     case 1: //when the duck dies
+        duck.speed = 1.0; //reset de la vitesse
         duck.sprite->rect_src->x = 450;
-        duck.sprite->rect_src->y = 240;
+        //duck.sprite->rect_src->y = 240;
+        duck.sprite->h = 80;
+        duck.sprite->rect_src->h = duck.sprite->h;
         duck.nbr_sprite = 1;
         duck.sprite->x_src = 450;
         duck.mvt_x = 0;
@@ -201,11 +204,13 @@ void changeDuckAnimation(Duck &duck, int anim_type)
         break;
 
     case 2: //when the duck falls
+        duck.mvt_x = 0;
+        duck.mvt_y = 0;
         duck.nbr_sprite = 2;
         duck.sprite->x_src = duck.sprite->rect_src->x = 532;
-        duck.sprite->rect_src->y = 246;
+        //duck.sprite->rect_src->y = 246;
         duck.sprite->w = 48;
-        duck.sprite->h = 62;
+        duck.sprite->h = 80;
         duck.sprite->rect_src->h = duck.sprite->h;
         duck.sprite->rect_src->w = duck.sprite->w;
         duck.mvt_y = 15;

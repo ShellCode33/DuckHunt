@@ -231,7 +231,7 @@ int main(int argc, char **argv)
                         displayDuckHit(screen, duck, current_wave, duck_hit_img);
 
                         //si les canards sont morts et plus à l'écran, alors la vague est terminée (ou s'il n'y a plus de balle)
-                        if((duck[current_wave*2-1].dead && duck[current_wave*2 - 2].dead && !duck[current_wave*2-1].displayed && !duck[current_wave*2-2].displayed) || !bullet_left)
+                        if((duck[current_wave*2-1].dead && duck[current_wave*2 - 2].dead && !duck[current_wave*2-1].displayed && !duck[current_wave*2-2].displayed) || (!bullet_left && (!duck[current_wave*2-1].dead || !duck[current_wave*2-2].dead)))
                             wave_finished = true;
 
                         if(wave_finished)
@@ -241,9 +241,6 @@ int main(int argc, char **argv)
                             {
                                 changeDogAnimation(dog, 4);
                                 dog.state = 4;
-
-                                //TODO
-                                //il faut tester les types des canards qui ont été tués afin d'ajuster le Rect_Src.x en conséquence
                             }
 
                             else
@@ -266,7 +263,7 @@ int main(int argc, char **argv)
                                     deleteDuck(duck[i]);
 
                                 for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
-                                    initDuck(entity_sprites, duck[i], levels[level-1][i%3]);
+                                    initDuck(entity_sprites, duck[i], i%3);
 
                                 current_wave = 1;
                                 new_level = true;
