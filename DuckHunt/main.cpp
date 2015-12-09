@@ -88,7 +88,7 @@ int main(int argc, char **argv)
 
     int i;
     for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
-        initDuck(entity_sprites, duck[i]);
+        initDuck(entity_sprites, duck[i], i%3);
 
     //------------------------------------------------------------
 
@@ -137,11 +137,11 @@ int main(int argc, char **argv)
 
             else if(event.type == SDL_MOUSEBUTTONDOWN && display == GAME && gs == DUCK && bullet_left > 0)
             {
-                if(killDuck(duck[current_wave*2-1], event))
-                    score+=1000;
+                if(!duck[current_wave*2-1].dead && killDuck(duck[current_wave*2-1], event))
+                    score += (duck[current_wave*2-1].type+1)*500;
 
-                else if(killDuck(duck[current_wave*2-2], event))
-                    score+=1000;
+                else if(!duck[current_wave*2-2].dead && killDuck(duck[current_wave*2-2], event))
+                    score += (duck[current_wave*2-2].type+1)*500;
 
                 bullet_left--;
             }
@@ -266,7 +266,7 @@ int main(int argc, char **argv)
                                     deleteDuck(duck[i]);
 
                                 for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
-                                    initDuck(entity_sprites, duck[i]);
+                                    initDuck(entity_sprites, duck[i], levels[level-1][i%3]);
 
                                 current_wave = 1;
                                 new_level = true;

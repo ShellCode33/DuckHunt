@@ -1,6 +1,6 @@
 #include "duck.h"
 
-void initDuck(SDL_Surface* entity_sprites, Duck &duck)
+void initDuck(SDL_Surface* entity_sprites, Duck &duck, int type)
 {
     duck.sprite = new Sprite;
     duck.sprite->img = entity_sprites;
@@ -16,7 +16,24 @@ void initDuck(SDL_Surface* entity_sprites, Duck &duck)
     duck.sprite->rect_src->h = duck.sprite->h;
     duck.sprite->rect_src->w = duck.sprite->w;
     duck.sprite->rect_src->x = 12;
-    duck.sprite->rect_src->y = 227;
+
+    if(type == 0)
+    {
+        duck.sprite->rect_src->y = 227;
+        duck.speed = 1.0;
+    }
+
+    else if(type == 1)
+    {
+        duck.sprite->rect_src->y = 316;
+        duck.speed = 1.5;
+    }
+
+    else if(type == 2)
+    {
+        duck.sprite->rect_src->y = 402;
+        duck.speed = 2.0;
+    }
 
     duck.sprite->rect_dst = new SDL_Rect;
     duck.sprite->rect_dst->h = duck.sprite->h;
@@ -24,12 +41,12 @@ void initDuck(SDL_Surface* entity_sprites, Duck &duck)
     duck.sprite->rect_dst->x = duck.sprite->x;
     duck.sprite->rect_dst->y = duck.sprite->y;
 
-    duck.speed = 1.0;
+    duck.type = type;
 
     duck.dead = false;
     duck.displayed = true;
 
-    bool colTopBottom = false; //colllision en haut et en bas de l'ecran
+    bool colTopBottom = false; //collision en haut et en bas de l'ecran
     bool colLeftRight = false; //collision a gauche et a droite de l'ecran
 
     duckRandTrajectory(duck, colTopBottom, colLeftRight);

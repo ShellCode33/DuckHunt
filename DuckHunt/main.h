@@ -5,6 +5,7 @@
 #include "dog.h"
 #include "duck.h"
 #include "menu.h"
+#include "level.h"
 
 enum Display
 {
