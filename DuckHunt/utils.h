@@ -68,6 +68,7 @@ struct Score
 {
     int cooldown;
     Sprite *sprite;
+    int alpha;
 };
 
 SDL_Surface* loadImageWithColorKey(const char* filename, bool colorkey, int r, int g, int b);

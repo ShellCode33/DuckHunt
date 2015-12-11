@@ -149,6 +149,8 @@ int main(int argc, char **argv)
                     score += (duck[current_wave*2-1].type+1)*500;
                     tot_duck_killed++;
                     duckIsDead1 = true;
+                    duckScore.cooldown = 50;
+                    duckScore.alpha = 255;
                 }
 
                 else if(!duck[current_wave*2-2].dead && killDuck(duck[current_wave*2-2], event))
@@ -156,6 +158,8 @@ int main(int argc, char **argv)
                     score += (duck[current_wave*2-2].type+1)*500;
                     tot_duck_killed++;
                     duckIsDead2 = true;
+                    duckScore.cooldown = 50;
+                    duckScore.alpha = 255;
                 }
 
                 bullet_left--;
@@ -247,15 +251,32 @@ int main(int argc, char **argv)
 
                         if(duckIsDead1 && duck[current_wave*2-1].dead)
                         {
-                            displayDuckScore(duck[current_wave*2-1], duckScore, screen);
-                            duckIsDead1 = false;
+                            if(duckScore.cooldown >= 0)
+                            {
+                                displayDuckScore(duck[current_wave*2-1], duckScore, screen);
+                                duckScore.cooldown--;
+                                if(duckScore.alpha > 0)
+                                    duckScore.alpha -= 5;
+                            }
+
+                            else
+                                duckIsDead1 = false;
+
 
                         }
 
                         if(duckIsDead2 && duck[current_wave*2-2].dead)
                         {
-                            displayDuckScore(duck[current_wave*2-2], duckScore, screen);
-                            duckIsDead2 = false;
+                            if(duckScore.cooldown >= 0)
+                            {
+                                displayDuckScore(duck[current_wave*2-2], duckScore, screen);
+                                duckScore.cooldown--;
+                                if(duckScore.alpha > 0)
+                                    duckScore.alpha -= 5;
+                            }
+
+                            else
+                                duckIsDead2 = false;
                         }
 
                         //si les canards sont morts et plus à l'écran, alors la vague est terminée (ou s'il n'y a plus de balle)
