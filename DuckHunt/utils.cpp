@@ -116,3 +116,24 @@ void displayDuckHit(SDL_Surface *screen, Duck duck[], int current_wave, SDL_Surf
         dst_rect.x += dst_rect.w + 3;
     }
 }
+
+void hitDuckScore(Duck &duck,Score &duckScore, SDL_Surface* screen)
+{
+    duckScore.sprite->rect_dst->x = duck.sprite->x + duck.sprite->w/2;
+    duckScore.sprite->rect_dst->y = duck.sprite->y + 10;
+
+    duckScore.sprite->rect_src->x = 0;
+    duckScore.sprite->rect_src->w = 40;
+    duckScore.sprite->rect_src->h = 14;
+
+    if(duck.type == 0)
+        duckScore.sprite->rect_src->y = 42;
+
+    else if(duck.type == 1)
+        duckScore.sprite->rect_src->y = 26;
+
+    else
+        duckScore.sprite->rect_src->y = 10;
+
+    SDL_BlitSurface(duckScore.sprite->img, duckScore.sprite->rect_src, screen, duckScore.sprite->rect_dst);
+}

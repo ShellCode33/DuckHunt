@@ -40,6 +40,7 @@ int main(int argc, char **argv)
     int current_wave = 1; //contient la vague courrante, 1 vague = 2 canards, il y a 5 vagues par niveau
     bool wave_finished = false; //Permet de savoir quand afficher le chien qui rigole ou alors celui avec les canards dans la/les main(s)
     bool new_level = true; //Permet de savoir si on démarre un nouveau niveau afin de ne pas afficher le niveau à chaque fin de wave
+    bool duckIsDead = false;
     int level = 1; //niveau courant en commencant la partie
     int bullet_left = 3;
     int tot_duck_killed = 0; //nbr de canards tués pendant 1 level
@@ -86,6 +87,12 @@ int main(int argc, char **argv)
     initDog(entity_sprites, dog);
 
     Duck duck[NB_DUCK_PER_LEVEL]; //tableau de cannards (10 par niveau)
+
+    Score duckScore;
+    duckScore.sprite = new Sprite;
+    duckScore.sprite->rect_dst = new SDL_Rect;
+    duckScore.sprite->rect_src = new SDL_Rect;
+    duckScore.sprite->img = loadImageWithColorKey("res/sprites/points.png", true, 0, 0, 0);
 
     int i;
     for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
@@ -235,6 +242,19 @@ int main(int argc, char **argv)
                         displayScore(screen, vsmall_font, score);
 
                         displayDuckHit(screen, duck, current_wave, duck_hit_img);
+
+			 if(duckIsDead && duck[current_wave*2-1].dead)
+                        {
+                            hitDuckScore(duck[current_wave*2-1], duckScore, screen);
+                            duckIsDead = false;
+
+                        }
+
+                        else if(duckIsDead && duck[current_wave*2-2].dead)
+                        {
+                            hitDuckScore(duck[current_wave*2-2], duckScore, screen);
+                            duckIsDead = false;
+                        }
 
                         //si les canards sont morts et plus à l'écran, alors la vague est terminée (ou s'il n'y a plus de balle)
                         if((duck[current_wave*2-1].dead && duck[current_wave*2 - 2].dead && !duck[current_wave*2-1].displayed && !duck[current_wave*2-2].displayed) || (!bullet_left && (!duck[current_wave*2-1].dead || !duck[current_wave*2-2].dead)))
@@ -398,6 +418,14 @@ int main(int argc, char **argv)
     SDL_FreeSurface(background);
     SDL_FreeSurface(fake_background);
     deleteDog(dog);
+
+	//------ Remove Score struct ------
+	delete duckScore.sprite->rect_src;
+	delete duckScore.sprite->rect_dst;
+	delete duckScore.sprite->img;
+	delete duckScore.sprite;
+	//---------------------------------
+
 
     for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
         deleteDuck(duck[i]);
