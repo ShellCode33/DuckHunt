@@ -230,7 +230,7 @@ void changeDuckAnimation(Duck &duck, int anim_type)
     }
 }
 
-void displayDuckScore(Duck &duck,Score &duckScore, SDL_Surface* screen)
+void displayDuckScore(Duck &duck, Score &duckScore, SDL_Surface* screen)
 {
     duckScore.sprite->rect_dst->x = duck.sprite->x + duck.sprite->w/2;
     duckScore.sprite->rect_dst->y = duck.sprite->y + 10;

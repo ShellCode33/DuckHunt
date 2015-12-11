@@ -40,7 +40,7 @@ int main(int argc, char **argv)
     int current_wave = 1; //contient la vague courrante, 1 vague = 2 canards, il y a 5 vagues par niveau
     bool wave_finished = false; //Permet de savoir quand afficher le chien qui rigole ou alors celui avec les canards dans la/les main(s)
     bool new_level = true; //Permet de savoir si on démarre un nouveau niveau afin de ne pas afficher le niveau à chaque fin de wave
-    bool duckIsDead = false;
+    bool duckIsDead1 = false, duckIsDead2 = false;
     int level = 1; //niveau courant en commencant la partie
     int bullet_left = 3;
     int tot_duck_killed = 0; //nbr de canards tués pendant 1 level
@@ -148,12 +148,14 @@ int main(int argc, char **argv)
                 {
                     score += (duck[current_wave*2-1].type+1)*500;
                     tot_duck_killed++;
+                    duckIsDead1 = true;
                 }
 
                 else if(!duck[current_wave*2-2].dead && killDuck(duck[current_wave*2-2], event))
                 {
                     score += (duck[current_wave*2-2].type+1)*500;
                     tot_duck_killed++;
+                    duckIsDead2 = true;
                 }
 
                 bullet_left--;
@@ -243,17 +245,17 @@ int main(int argc, char **argv)
 
                         displayDuckHit(screen, duck, current_wave, duck_hit_img);
 
-                        if(duckIsDead && duck[current_wave*2-1].dead)
+                        if(duckIsDead1 && duck[current_wave*2-1].dead)
                         {
                             displayDuckScore(duck[current_wave*2-1], duckScore, screen);
-                            duckIsDead = false;
+                            duckIsDead1 = false;
 
                         }
 
-                        else if(duckIsDead && duck[current_wave*2-2].dead)
+                        if(duckIsDead2 && duck[current_wave*2-2].dead)
                         {
                             displayDuckScore(duck[current_wave*2-2], duckScore, screen);
-                            duckIsDead = false;
+                            duckIsDead2 = false;
                         }
 
                         //si les canards sont morts et plus à l'écran, alors la vague est terminée (ou s'il n'y a plus de balle)
