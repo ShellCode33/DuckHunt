@@ -279,8 +279,25 @@ int main(int argc, char **argv)
                                 duckIsDead2 = false;
                         }
 
+                        if(!bullet_left && (!duck[current_wave*2-1].dead || !duck[current_wave*2-2].dead) && (duck[current_wave*2-1].displayed || duck[current_wave*2-2].displayed)) // s'il n'y a plus de balle et qu'un des deux canards n'est pas mort, il faut le faire sortir
+                        {
+                            if(!duck[current_wave*2-1].dead)
+                            {
+                                //TODO
+
+                                fadeOutDuck(duck[current_wave*2-1], screen);
+                            }
+
+                            if(!duck[current_wave*2-2].dead)
+                            {
+                                //TODO
+
+                                fadeOutDuck(duck[current_wave*2-2]);
+                            }
+                        }
+
                         //si les canards sont morts et plus à l'écran, alors la vague est terminée (ou s'il n'y a plus de balle)
-                        if((duck[current_wave*2-1].dead && duck[current_wave*2 - 2].dead && !duck[current_wave*2-1].displayed && !duck[current_wave*2-2].displayed) || (!bullet_left && (!duck[current_wave*2-1].dead || !duck[current_wave*2-2].dead)))
+                        else if((duck[current_wave*2-1].dead && duck[current_wave*2 - 2].dead && !duck[current_wave*2-1].displayed && !duck[current_wave*2-2].displayed) || (!bullet_left && (!duck[current_wave*2-1].dead || !duck[current_wave*2-2].dead)))
                             wave_finished = true;
 
                         if(wave_finished)
@@ -305,7 +322,6 @@ int main(int argc, char **argv)
 
                                     else if(duck[current_wave*2-1].type == 2 && duck[current_wave*2-2].type == 2)
                                         dog.sprite->rect_src->x = 1042;
-
 
                                     else if( (duck[current_wave*2-1].type == 0 && duck[current_wave*2-2].type == 1) || (duck[current_wave*2-2].type == 0 && duck[current_wave*2-1].type == 1) )
                                         dog.sprite->rect_src->x = 1157;
