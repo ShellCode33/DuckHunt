@@ -57,6 +57,7 @@ void initDuck(SDL_Surface* entity_sprites, Duck &duck, int levels[][3], int curr
 
     duck.dead = false;
     duck.displayed = true;
+    duck.flee = false;
 
     bool colTopBottom = false; //collision en haut et en bas de l'ecran
     bool colLeftRight = false; //collision a gauche et a droite de l'ecran
@@ -69,43 +70,46 @@ void duckRandTrajectory (Duck &duck, bool colTopBottom, bool colLeftRight)
     int trajectoires[] = {1, 2, 3, 4, 5, 6};
     int direction[]= {-1, 1};
 
-    if (colLeftRight)
+    if(!duck.flee)
     {
-        if (duck.sprite->x > SCREEN_WIDTH/2)
+        if (colLeftRight)
         {
-            duck.mvt_x=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[0];
-            duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7+duck.mvt_x);
+            if (duck.sprite->x > SCREEN_WIDTH/2)
+            {
+                duck.mvt_x=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[0];
+                duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7+duck.mvt_x);
+            }
+            else if (duck.sprite->x < SCREEN_WIDTH/2)
+            {
+                duck.mvt_x=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[1];
+                duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7-duck.mvt_x);
+            }
         }
-        else if (duck.sprite->x < SCREEN_WIDTH/2)
+
+        else if (colTopBottom)
         {
-            duck.mvt_x=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[1];
-            duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7-duck.mvt_x);
+            if (duck.sprite->y > SCREEN_HEIGHT/3)
+            {
+                duck.mvt_y=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[0];
+                duck.mvt_x=direction[rand()%sizeof(direction)/sizeof(int)]*(7+duck.mvt_y);
+            }
+            else if (duck.sprite->y < SCREEN_HEIGHT/2)
+            {
+                duck.mvt_y=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[1];
+                duck.mvt_x=direction[rand()%sizeof(direction)/sizeof(int)]*(7-duck.mvt_y);
+            }
         }
-    }
 
-    else if (colTopBottom)
-    {
-        if (duck.sprite->y > SCREEN_HEIGHT/3)
+        else if (!colTopBottom && !colLeftRight)
         {
-            duck.mvt_y=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[0];
-            duck.mvt_x=direction[rand()%sizeof(direction)/sizeof(int)]*(7+duck.mvt_y);
+            duck.mvt_x=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[rand()%sizeof(direction)/sizeof(int)];
+
+            if (duck.mvt_x > 0)
+                duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7-duck.mvt_x);
+
+            else if (duck.mvt_x < 0)
+                duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7+duck.mvt_x);
         }
-        else if (duck.sprite->y < SCREEN_HEIGHT/2)
-        {
-            duck.mvt_y=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[1];
-            duck.mvt_x=direction[rand()%sizeof(direction)/sizeof(int)]*(7-duck.mvt_y);
-        }
-    }
-
-    else if (!colTopBottom && !colLeftRight)
-    {
-        duck.mvt_x=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[rand()%sizeof(direction)/sizeof(int)];
-
-        if (duck.mvt_x > 0)
-            duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7-duck.mvt_x);
-
-        else if (duck.mvt_x < 0)
-            duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7+duck.mvt_x);
     }
 }
 
@@ -271,7 +275,12 @@ void displayDuckScore(Duck &duck, Score &duckScore, SDL_Surface* screen)
 
 void fadeOutDuck(Duck &duck, SDL_Surface* screen)
 {
+    duck.flee = true;
+    duck.mvt_x = 3;
+    duck.mvt_y = -3;
 
+    if(duck.sprite->x > SCREEN_WIDTH || duck.sprite->y < 0)
+        duck.displayed = false;
 }
 
 

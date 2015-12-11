@@ -286,6 +286,8 @@ int main(int argc, char **argv)
                                 //TODO
 
                                 fadeOutDuck(duck[current_wave*2-1], screen);
+                                if(!duck[current_wave*2-1].displayed && !duck[current_wave*2-2].displayed)
+                                    wave_finished = true;
                             }
 
                             if(!duck[current_wave*2-2].dead)
@@ -293,6 +295,8 @@ int main(int argc, char **argv)
                                 //TODO
 
                                 fadeOutDuck(duck[current_wave*2-2], screen);
+                                if(!duck[current_wave*2-2].displayed && !duck[current_wave*2-1].displayed)
+                                    wave_finished = true;
                             }
                         }
 
