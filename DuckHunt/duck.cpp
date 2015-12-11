@@ -1,6 +1,6 @@
 #include "duck.h"
 
-void initDuck(SDL_Surface* entity_sprites, Duck &duck, int type)
+void initDuck(SDL_Surface* entity_sprites, Duck &duck, int levels[][3], int current_level)
 {
     duck.sprite = new Sprite;
     duck.sprite->img = entity_sprites;
@@ -17,19 +17,33 @@ void initDuck(SDL_Surface* entity_sprites, Duck &duck, int type)
     duck.sprite->rect_src->w = duck.sprite->w;
     duck.sprite->rect_src->x = 12;
 
-    if(type == 0)
+    //init duck type
+
+    int random_duck = rand()%3;
+
+    while(levels[current_level-1][random_duck] <= 0)
+        random_duck = (random_duck+1) % 3;
+
+    duck.type = random_duck;
+    levels[current_level-1][random_duck]--; //on enlève le canard du level
+
+    //--------------
+
+
+
+    if(duck.type == 0)
     {
         duck.sprite->rect_src->y = 227;
         duck.speed = 1.0;
     }
 
-    else if(type == 1)
+    else if(duck.type == 1)
     {
         duck.sprite->rect_src->y = 316;
         duck.speed = 1.5;
     }
 
-    else if(type == 2)
+    else if(duck.type == 2)
     {
         duck.sprite->rect_src->y = 402;
         duck.speed = 2.0;
@@ -40,8 +54,6 @@ void initDuck(SDL_Surface* entity_sprites, Duck &duck, int type)
     duck.sprite->rect_dst->w = duck.sprite->w;
     duck.sprite->rect_dst->x = duck.sprite->x;
     duck.sprite->rect_dst->y = duck.sprite->y;
-
-    duck.type = type;
 
     duck.dead = false;
     duck.displayed = true;

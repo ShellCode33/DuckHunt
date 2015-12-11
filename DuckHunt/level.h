@@ -8,7 +8,9 @@ int level[] = {nb_type0, nb_type1, nb_type2};
 
 */
 
-int levels[][3]  {
+#define NB_LEVEL 10
+
+int levels[NB_LEVEL][3]  {
                     {5, 3, 2},
                     {4, 4, 2},
                     {4, 3, 3},

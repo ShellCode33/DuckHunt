@@ -42,6 +42,7 @@ int main(int argc, char **argv)
     bool new_level = true; //Permet de savoir si on démarre un nouveau niveau afin de ne pas afficher le niveau à chaque fin de wave
     int level = 1; //niveau courant en commencant la partie
     int bullet_left = 3;
+    int tot_duck_killed = 0; //nbr de canards tués pendant 1 level
 
     Display display = MENU;
     GameState gs = DOG;
@@ -88,8 +89,7 @@ int main(int argc, char **argv)
 
     int i;
     for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
-        initDuck(entity_sprites, duck[i], i%3);
-
+        initDuck(entity_sprites, duck[i], levels, level);
     //------------------------------------------------------------
 
     // program main loop
@@ -138,10 +138,16 @@ int main(int argc, char **argv)
             else if(event.type == SDL_MOUSEBUTTONDOWN && display == GAME && gs == DUCK && bullet_left > 0)
             {
                 if(!duck[current_wave*2-1].dead && killDuck(duck[current_wave*2-1], event))
+                {
                     score += (duck[current_wave*2-1].type+1)*500;
+                    tot_duck_killed++;
+                }
 
                 else if(!duck[current_wave*2-2].dead && killDuck(duck[current_wave*2-2], event))
+                {
                     score += (duck[current_wave*2-2].type+1)*500;
+                    tot_duck_killed++;
+                }
 
                 bullet_left--;
             }
@@ -241,6 +247,71 @@ int main(int argc, char **argv)
                             {
                                 changeDogAnimation(dog, 4);
                                 dog.state = 4;
+
+                                //2 canards ont été tués
+                                if(duck[current_wave*2-1].dead && duck[current_wave*2-2].dead)
+                                {
+                                    dog.sprite->w = 115;
+                                    dog.sprite->rect_src->w = dog.sprite->w;
+
+                                    if(duck[current_wave*2-1].type == 0 && duck[current_wave*2-2].type == 0)
+                                        dog.sprite->rect_src->x = 579;
+
+                                    else if(duck[current_wave*2-1].type == 1 && duck[current_wave*2-2].type == 1)
+                                        dog.sprite->rect_src->x = 694;
+
+                                    else if(duck[current_wave*2-1].type == 2 && duck[current_wave*2-2].type == 2)
+                                        dog.sprite->rect_src->x = 1042;
+
+
+                                    else if( (duck[current_wave*2-1].type == 0 && duck[current_wave*2-2].type == 1) || (duck[current_wave*2-2].type == 0 && duck[current_wave*2-1].type == 1) )
+                                        dog.sprite->rect_src->x = 1157;
+
+                                    else if( (duck[current_wave*2-1].type == 0 && duck[current_wave*2-2].type == 2) || (duck[current_wave*2-2].type == 0 && duck[current_wave*2-1].type == 2) )
+                                        dog.sprite->rect_src->x = 808;
+
+                                    else if( (duck[current_wave*2-1].type == 1 && duck[current_wave*2-2].type == 2) || (duck[current_wave*2-2].type == 1 && duck[current_wave*2-1].type == 2) )
+                                        dog.sprite->rect_src->x = 927;
+                                }
+
+                                //1 canard a été tué
+                                else if(duck[current_wave*2-1].dead)
+                                {
+                                    switch(duck[current_wave*2-1].type)
+                                    {
+                                        case 0:
+                                            dog.sprite->rect_src->x = 488;
+                                            break;
+
+                                        case 1:
+                                            dog.sprite->rect_src->x = 305;
+                                            break;
+
+                                        case 2:
+                                            dog.sprite->rect_src->x = 396;
+                                            break;
+                                    }
+                                }
+
+                                //1 canard (l'autre) a été tué
+                                else if(duck[current_wave*2-2].dead)
+                                {
+                                    switch(duck[current_wave*2-2].type)
+                                    {
+                                        case 0:
+                                            dog.sprite->rect_src->x = 488;
+                                            break;
+
+                                        case 1:
+                                            dog.sprite->rect_src->x = 305;
+                                            break;
+
+                                        case 2:
+                                            dog.sprite->rect_src->x = 396;
+                                            break;
+                                    }
+                                }
+
                             }
 
                             else
@@ -252,10 +323,11 @@ int main(int argc, char **argv)
                             current_wave++;
                             bullet_left = 3;
 
-                            //on change de niveau
-                            if(current_wave > 5)
+                            //on change de niveau si on a tué minimum 6 canards
+                            if(current_wave > 5 && tot_duck_killed > 5)
                             {
                                 level++;
+                                tot_duck_killed = 0;
 
                                 //reset ducks
                                 int i;
@@ -263,17 +335,19 @@ int main(int argc, char **argv)
                                     deleteDuck(duck[i]);
 
                                 for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
-                                    initDuck(entity_sprites, duck[i], i%3);
+                                    initDuck(entity_sprites, duck[i], levels, level);
 
                                 current_wave = 1;
                                 new_level = true;
                             }
 
+                            //Si la vague est terminée mais que pas assez de canards ont été tués, alors on affiche gameover
+                            else if(current_wave > 5)
+                                display = GAME_OVER;
+
                             gs = DOG;
                             wave_finished = false;
                         }
-
-                        //----------------------------------------------------------------------
 
                         SDL_Delay(12);
                         break;
@@ -282,6 +356,27 @@ int main(int argc, char **argv)
 
                 if(dog.state != 1 && dog.state != 2 && dog.state != 3)
                     SDL_BlitSurface(fake_background, NULL, screen, &dst_background); //on affiche l'image de fond
+
+                break;
+            }
+
+            case GAME_OVER:
+            {
+                SDL_BlitSurface(background, NULL, screen, &dst_background); //on affiche l'image de fond
+
+                SDL_Color background_color = {0, 193, 255, 0};
+                SDL_Color text_color = {255, 50, 50, 0};
+                string text = "Game Over";
+
+                SDL_Surface *text_game_over = TTF_RenderText_Shaded(small_font, text.c_str(), text_color, background_color);
+
+                SDL_Rect text_rect;
+                text_rect.w = text_game_over->w;
+                text_rect.h = text_game_over->h;
+                text_rect.x = (SCREEN_WIDTH - text_game_over->w) / 2;
+                text_rect.y = (SCREEN_HEIGHT - text_game_over->h) / 3;
+
+                SDL_BlitSurface(text_game_over, NULL, screen, &text_rect);
 
                 break;
             }

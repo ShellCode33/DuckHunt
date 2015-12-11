@@ -184,7 +184,7 @@ void changeDogAnimation(Dog &dog, int anim_type)
             dog.nbr_sprite = 1;
             dog.sprite->x = SCREEN_WIDTH / 2;
             dog.sprite->y = 590;
-            dog.sprite->rect_src->x = 305;
+            dog.sprite->rect_src->x = 305; //sera redéfinit quoi qu'il arrive en fonction du type de canard tué
             dog.sprite->rect_src->y = 125;
             dog.sprite->h = dog.sprite->rect_src->h = 85;
             dog.sprite->w = dog.sprite->rect_src->w = 90;
