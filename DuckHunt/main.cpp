@@ -292,7 +292,7 @@ int main(int argc, char **argv)
                             {
                                 //TODO
 
-                                fadeOutDuck(duck[current_wave*2-2]);
+                                fadeOutDuck(duck[current_wave*2-2], screen);
                             }
                         }
 
