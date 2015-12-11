@@ -243,16 +243,16 @@ int main(int argc, char **argv)
 
                         displayDuckHit(screen, duck, current_wave, duck_hit_img);
 
-			 if(duckIsDead && duck[current_wave*2-1].dead)
+                        if(duckIsDead && duck[current_wave*2-1].dead)
                         {
-                            hitDuckScore(duck[current_wave*2-1], duckScore, screen);
+                            displayDuckScore(duck[current_wave*2-1], duckScore, screen);
                             duckIsDead = false;
 
                         }
 
                         else if(duckIsDead && duck[current_wave*2-2].dead)
                         {
-                            hitDuckScore(duck[current_wave*2-2], duckScore, screen);
+                            displayDuckScore(duck[current_wave*2-2], duckScore, screen);
                             duckIsDead = false;
                         }
 

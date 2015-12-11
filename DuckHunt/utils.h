@@ -74,7 +74,6 @@ SDL_Surface* loadImageWithColorKey(const char* filename, bool colorkey, int r, i
 void displayBulletLeft(SDL_Surface *screen, SDL_Surface *bullet_img, int bullet_left);
 void displayScore(SDL_Surface *screen, TTF_Font* font, int score);
 void displayDuckHit(SDL_Surface *screen, Duck duck[], int current_wave, SDL_Surface *duck_hit_img);
-void hitDuckScore(Duck &duck,Score &duckScore, SDL_Surface* screen);
 
 
 #endif
