@@ -282,18 +282,10 @@ int main(int argc, char **argv)
                         if(!bullet_left && (!duck[current_wave*2-1].dead || !duck[current_wave*2-2].dead) && (duck[current_wave*2-1].displayed || duck[current_wave*2-2].displayed)) // s'il n'y a plus de balle et qu'un des deux canards n'est pas mort, il faut le faire sortir
                         {
                             if(!duck[current_wave*2-1].dead)
-
-                                //TODO
-
                                 fadeOutDuck(duck[current_wave*2-1]);
 
-
                             if(!duck[current_wave*2-2].dead)
-
-                                //TODO
-
                                 fadeOutDuck(duck[current_wave*2-2]);
-
                         }
 
                         //si les canards sont morts et plus à l'écran, alors la vague est terminée (ou s'il n'y a plus de balle)
