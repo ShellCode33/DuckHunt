@@ -251,6 +251,11 @@ void displayDuckScore(Duck &duck, Score &duckScore, SDL_Surface* screen)
     SDL_BlitSurface(duckScore.sprite->img, duckScore.sprite->rect_src, screen, duckScore.sprite->rect_dst);
 }
 
+void fadeOutDuck(Duck &duck, SDL_Surface* screen)
+{
+
+}
+
 
 void deleteDuck(Duck &duck)
 {

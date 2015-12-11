@@ -11,6 +11,7 @@ void deleteDuck(Duck &duck);
 void duckRandTrajectory (Duck &duck, bool colTopBottom, bool colLeftRight);
 bool killDuck(Duck &duck, SDL_Event &event);
 void changeDuckAnimation(Duck &duck, int anim_type);
+void fadeOutDuck(Duck &duck, SDL_Surface* screen);
 void displayDuckScore(Duck &duck,Score &duckScore, SDL_Surface* screen);
 
 #endif
