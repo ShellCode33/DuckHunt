@@ -59,17 +59,33 @@ void initDuck(SDL_Surface* entity_sprites, Duck &duck, int levels[][3], int curr
     duck.displayed = true;
     duck.flee = false;
 
-    bool colTopBottom = false; //collision en haut et en bas de l'ecran
-    bool colLeftRight = false; //collision a gauche et a droite de l'ecran
-
-    duckRandTrajectory(duck, colTopBottom, colLeftRight);
+    duckRandTrajectory(duck, false, false);
 }
 
-void duckRandTrajectory (Duck &duck, bool colTopBottom, bool colLeftRight)
+
+
+
+/*
+ *
+ *                      CETTE PUTAIN DE FONCTION EST A REFAIRE ENTIEREMENT !!!
+ *                                              |
+ *                                              |
+ *                                              |
+ *                                              |
+ *                                              |
+ *                                              |
+ *                                              |
+ *                                              |
+ *                                              |
+ *                                              V
+ */
+
+void duckRandTrajectory(Duck &duck, bool colTopBottom, bool colLeftRight)
 {
     int trajectoires[] = {1, 2, 3, 4, 5, 6};
     int direction[]= {-1, 1};
 
+    //Si le canard est en train de fuire, on désactive les collisions
     if(!duck.flee)
     {
         if (colLeftRight)
@@ -182,6 +198,8 @@ bool killDuck(Duck &duck, SDL_Event &event)
 
 void moveDuck(Duck &duck)
 {
+    if(duck.mvt_y == 0)
+
     duck.sprite->x += duck.mvt_x * duck.speed;
     duck.sprite->y += duck.mvt_y * duck.speed;
 
@@ -193,7 +211,7 @@ void showDuck(SDL_Surface *screen, Duck &duck)
 {
         SDL_BlitSurface(duck.sprite->img, duck.sprite->rect_src, screen, duck.sprite->rect_dst);
 
-        if (duck.nbr_sprite>1)
+        if(duck.nbr_sprite>1)
         {
             duck.sprite->rect_src->x += duck.sprite->w;
             duck.sprite->rect_src->x %= (duck.sprite->x_src + duck.sprite->w * duck.nbr_sprite);
@@ -207,30 +225,30 @@ void changeDuckAnimation(Duck &duck, int anim_type)
 {
     switch(anim_type)
     {
-    case 1: //when the duck dies
-        duck.speed = 1.0; //reset de la vitesse
-        duck.sprite->rect_src->x = 450;
-        //duck.sprite->rect_src->y = 240;
-        duck.sprite->h = 80;
-        duck.sprite->rect_src->h = duck.sprite->h;
-        duck.nbr_sprite = 1;
-        duck.sprite->x_src = 450;
-        duck.mvt_x = 0;
-        duck.mvt_y = 0;
-        break;
+        case 1: //when the duck dies
+            duck.speed = 1.0; //reset de la vitesse
+            duck.sprite->rect_src->x = 450;
+            //duck.sprite->rect_src->y = 240;
+            duck.sprite->h = 80;
+            duck.sprite->rect_src->h = duck.sprite->h;
+            duck.nbr_sprite = 1;
+            duck.sprite->x_src = 450;
+            duck.mvt_x = 0;
+            duck.mvt_y = 0;
+            break;
 
-    case 2: //when the duck falls
-        duck.mvt_x = 0;
-        duck.mvt_y = 0;
-        duck.nbr_sprite = 2;
-        duck.sprite->x_src = duck.sprite->rect_src->x = 532;
-        //duck.sprite->rect_src->y = 246;
-        duck.sprite->w = 48;
-        duck.sprite->h = 80;
-        duck.sprite->rect_src->h = duck.sprite->h;
-        duck.sprite->rect_src->w = duck.sprite->w;
-        duck.mvt_y = 15;
-        break;
+        case 2: //when the duck falls
+            duck.mvt_x = 0;
+            duck.mvt_y = 0;
+            duck.nbr_sprite = 2;
+            duck.sprite->x_src = duck.sprite->rect_src->x = 532;
+            //duck.sprite->rect_src->y = 246;
+            duck.sprite->w = 48;
+            duck.sprite->h = 80;
+            duck.sprite->rect_src->h = duck.sprite->h;
+            duck.sprite->rect_src->w = duck.sprite->w;
+            duck.mvt_y = 15;
+            break;
     }
 }
 
@@ -269,7 +287,7 @@ void displayDuckScore(Duck &duck, DuckScore &duckScore, SDL_Surface* screen)
     else
         duckScore.sprite->rect_src->y = 10;
 
-    SDL_SetAlpha(duckScore.sprite->img, SDL_SRCALPHA | SDL_RLEACCEL, duckScore.alpha);
+    SDL_SetAlpha(duckScore.sprite->img, SDL_SRCALPHA | SDL_RLEACCEL, duckScore.alpha); //disparition progressive
     SDL_BlitSurface(duckScore.sprite->img, duckScore.sprite->rect_src, screen, duckScore.sprite->rect_dst);
 }
 
@@ -279,7 +297,7 @@ void fadeOutDuck(Duck &duck)
     duck.mvt_x = 3;
     duck.mvt_y = -3;
 
-    if(duck.sprite->x > SCREEN_WIDTH || duck.sprite->y < 0)
+    if(duck.sprite->x-duck.sprite->w/2 > SCREEN_WIDTH || duck.sprite->y+duck.sprite->h/2 < 0)
         duck.displayed = false;
 }
 

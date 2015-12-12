@@ -200,8 +200,6 @@ int main(int argc, char **argv)
 
         } // end of message processing
 
-        // DRAWING STARTS HERE
-
         // clear screen
         SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 0, 0));
 
@@ -423,6 +421,9 @@ int main(int argc, char **argv)
 
                                 current_wave = 1;
                                 new_level = true;
+
+                                if(level > 5)
+                                    gs = BOSS;
                             }
 
                             //Si la vague est terminée mais que pas assez de canards ont été tués, alors on affiche gameover
@@ -451,6 +452,7 @@ int main(int argc, char **argv)
                                 for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
                                     initDuck(entity_sprites, duck[i], levels_copy, level);
 
+                                //reset dog
                                 changeDogAnimation(dog, 0);
                                 dog.state = 1;
                             }
@@ -460,6 +462,12 @@ int main(int argc, char **argv)
                         }
 
                         SDL_Delay(12);
+                        break;
+                    }
+
+                    case BOSS:
+                    {
+
                         break;
                     }
                 }
@@ -521,7 +529,7 @@ int main(int argc, char **argv)
     SDL_FreeSurface(fake_background);
     deleteDog(dog);
 
-	//------ Remove Score struct ------
+    //------ Remove DuckScore struct ------
     for(i = 0; i < 2; i++)
     {
         delete duckScore[i].sprite->rect_src;
@@ -529,15 +537,13 @@ int main(int argc, char **argv)
         delete duckScore[i].sprite->img;
         delete duckScore[i].sprite;
     }
-	//---------------------------------
+    //-------------------------------------
 
 
     for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
         deleteDuck(duck[i]);
 
     SDL_Quit();
-
-    // all is well ;)
     printf("Exited cleanly\n");
     return 0;
 }

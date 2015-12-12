@@ -18,7 +18,8 @@ enum GameState
 {
     DOG,
     LEVEL,
-    DUCK
+    DUCK,
+    BOSS
 };
 
 void processDog(SDL_Surface *screen, Dog &dog);
