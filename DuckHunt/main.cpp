@@ -45,6 +45,15 @@ int main(int argc, char **argv)
     int bullet_left = 3;
     int tot_duck_killed = 0; //nbr de canards tués pendant 1 level
 
+    int levels_copy[NB_LEVEL][3]; //on créé une copie des niveaux pour ne pas modifier l'original
+
+    int i, j;
+    for(i = 0; i < NB_LEVEL; i++)
+        for(j = 0; j < 3; j++)
+            levels_copy[i][j] = levels[i][j];
+
+
+
     Display display = MENU;
     GameState gs = DOG;
 
@@ -62,21 +71,28 @@ int main(int argc, char **argv)
 
 
     TTF_Font* vsmall_font = TTF_OpenFont("res/font/duck_hunt.ttf", 30);
-    TTF_Font* small_font = TTF_OpenFont("res/font/duck_hunt.ttf", 65);
+    TTF_Font* small_font = TTF_OpenFont("res/font/duck_hunt.ttf", 35);
+    TTF_Font* normal_font = TTF_OpenFont("res/font/duck_hunt.ttf", 65);
     TTF_Font* big_font = TTF_OpenFont("res/font/duck_hunt.ttf", 90);
     SDL_Color blackcolor = {0, 0, 0, 0};
 
     Button singleplayer;
-    singleplayer.surface = TTF_RenderText_Solid(small_font, "Play", blackcolor);
+    singleplayer.surface = TTF_RenderText_Solid(normal_font, "Play", blackcolor);
     singleplayer.x = SCREEN_WIDTH/2;
     singleplayer.y = SCREEN_HEIGHT/3;
     singleplayer.select = true;
 
     Button quit;
-    quit.surface = TTF_RenderText_Solid(small_font, "Quit", blackcolor);
+    quit.surface = TTF_RenderText_Solid(normal_font, "Quit", blackcolor);
     quit.x = SCREEN_WIDTH/2;
     quit.y = SCREEN_HEIGHT/2;
     quit.select = false;
+
+    Button menu; //bouton de retour au menu lorsque Game Over
+    menu.surface = TTF_RenderText_Solid(vsmall_font, "Retour au menu", blackcolor);
+    menu.x = SCREEN_WIDTH / 2;
+    menu.y = SCREEN_HEIGHT / 2;
+    menu.select = false;
 
     SDL_Rect dst_background;
     dst_background.x = dst_background.y = 0;
@@ -88,15 +104,18 @@ int main(int argc, char **argv)
 
     Duck duck[NB_DUCK_PER_LEVEL]; //tableau de cannards (10 par niveau)
 
-    Score duckScore;
-    duckScore.sprite = new Sprite;
-    duckScore.sprite->rect_dst = new SDL_Rect;
-    duckScore.sprite->rect_src = new SDL_Rect;
-    duckScore.sprite->img = loadImageWithColorKey("res/sprites/points.png", true, 0, 0, 0);
+    DuckScore duckScore[2]; //1 pour chaque canard
 
-    int i;
+    for(i = 0; i < 2; i++)
+    {
+        duckScore[i].sprite = new Sprite;
+        duckScore[i].sprite->rect_dst = new SDL_Rect;
+        duckScore[i].sprite->rect_src = new SDL_Rect;
+        duckScore[i].sprite->img = loadImageWithColorKey("res/sprites/points.png", true, 0, 0, 0);
+    }
+
     for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
-        initDuck(entity_sprites, duck[i], levels, level);
+        initDuck(entity_sprites, duck[i], levels_copy, level);
     //------------------------------------------------------------
 
     // program main loop
@@ -142,6 +161,20 @@ int main(int argc, char **argv)
                 }
             }
 
+            else if(display == GAME_OVER)
+            {
+                if(event.motion.x < (menu.x + menu.surface->w) && event.motion.x > menu.x && event.motion.y < (menu.y + menu.surface->h) && event.motion.y > menu.y)
+                {
+                    menu.select = true;
+
+                    if(event.type == SDL_MOUSEBUTTONDOWN)
+                        display = MENU;
+                }
+
+                else
+                    menu.select = false;
+            }
+
             else if(event.type == SDL_MOUSEBUTTONDOWN && display == GAME && gs == DUCK && bullet_left > 0)
             {
                 if(!duck[current_wave*2-1].dead && killDuck(duck[current_wave*2-1], event))
@@ -149,8 +182,8 @@ int main(int argc, char **argv)
                     score += (duck[current_wave*2-1].type+1)*500;
                     tot_duck_killed++;
                     duckIsDead1 = true;
-                    duckScore.cooldown = 50;
-                    duckScore.alpha = 255;
+                    duckScore[0].cooldown = 50;
+                    duckScore[0].alpha = 255;
                 }
 
                 else if(!duck[current_wave*2-2].dead && killDuck(duck[current_wave*2-2], event))
@@ -158,8 +191,8 @@ int main(int argc, char **argv)
                     score += (duck[current_wave*2-2].type+1)*500;
                     tot_duck_killed++;
                     duckIsDead2 = true;
-                    duckScore.cooldown = 50;
-                    duckScore.alpha = 255;
+                    duckScore[1].cooldown = 50;
+                    duckScore[1].alpha = 255;
                 }
 
                 bullet_left--;
@@ -176,7 +209,7 @@ int main(int argc, char **argv)
         {
             case MENU:
             {
-                showMenu(screen, menu_img, small_font, big_font, singleplayer, quit);
+                showMenu(screen, menu_img, normal_font, big_font, singleplayer, quit);
                 break;
             }
 
@@ -205,7 +238,7 @@ int main(int argc, char **argv)
                         string text = "Level ";
                         text += to_string(level);
 
-                        SDL_Surface *text_level = TTF_RenderText_Shaded(small_font, text.c_str(), blackcolor, color);
+                        SDL_Surface *text_level = TTF_RenderText_Shaded(normal_font, text.c_str(), blackcolor, color);
 
                         SDL_Rect text_rect;
                         text_rect.w = text_level->w;
@@ -251,12 +284,12 @@ int main(int argc, char **argv)
 
                         if(duckIsDead1 && duck[current_wave*2-1].dead)
                         {
-                            if(duckScore.cooldown >= 0)
+                            if(duckScore[0].cooldown >= 0)
                             {
-                                displayDuckScore(duck[current_wave*2-1], duckScore, screen);
-                                duckScore.cooldown--;
-                                if(duckScore.alpha > 0)
-                                    duckScore.alpha -= 5;
+                                displayDuckScore(duck[current_wave*2-1], duckScore[0], screen);
+                                duckScore[0].cooldown--;
+                                if(duckScore[0].alpha > 0)
+                                    duckScore[0].alpha -= 5;
                             }
 
                             else
@@ -267,12 +300,12 @@ int main(int argc, char **argv)
 
                         if(duckIsDead2 && duck[current_wave*2-2].dead)
                         {
-                            if(duckScore.cooldown >= 0)
+                            if(duckScore[1].cooldown >= 0)
                             {
-                                displayDuckScore(duck[current_wave*2-2], duckScore, screen);
-                                duckScore.cooldown--;
-                                if(duckScore.alpha > 0)
-                                    duckScore.alpha -= 5;
+                                displayDuckScore(duck[current_wave*2-2], duckScore[1], screen);
+                                duckScore[1].cooldown--;
+                                if(duckScore[1].alpha > 0)
+                                    duckScore[1].alpha -= 5;
                             }
 
                             else
@@ -386,7 +419,7 @@ int main(int argc, char **argv)
                                     deleteDuck(duck[i]);
 
                                 for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
-                                    initDuck(entity_sprites, duck[i], levels, level);
+                                    initDuck(entity_sprites, duck[i], levels_copy, level);
 
                                 current_wave = 1;
                                 new_level = true;
@@ -394,7 +427,33 @@ int main(int argc, char **argv)
 
                             //Si la vague est terminée mais que pas assez de canards ont été tués, alors on affiche gameover
                             else if(current_wave > 5)
+                            {
+                                SDL_ShowCursor(SDL_ENABLE); //On réactive la souris
                                 display = GAME_OVER;
+
+                                //ON RESET TOUT AU LEVEL 1 au cas où l'utilisateur voudrait rejouer une fois dans le menu
+                                level = 1;
+                                current_wave = 1;
+                                score = 0;
+                                tot_duck_killed = 0;
+                                new_level = true;
+
+                                //reset la copie de levels
+                                for(i = 0; i < NB_LEVEL; i++)
+                                    for(j = 0; j < 3; j++)
+                                        levels_copy[i][j] = levels[i][j];
+
+                                //reset ducks
+                                int i;
+                                for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
+                                    deleteDuck(duck[i]);
+
+                                for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
+                                    initDuck(entity_sprites, duck[i], levels_copy, level);
+
+                                changeDogAnimation(dog, 0);
+                                dog.state = 1;
+                            }
 
                             gs = DOG;
                             wave_finished = false;
@@ -419,7 +478,7 @@ int main(int argc, char **argv)
                 SDL_Color text_color = {255, 50, 50, 0};
                 string text = "Game Over";
 
-                SDL_Surface *text_game_over = TTF_RenderText_Shaded(small_font, text.c_str(), text_color, background_color);
+                SDL_Surface *text_game_over = TTF_RenderText_Shaded(normal_font, text.c_str(), text_color, background_color);
 
                 SDL_Rect text_rect;
                 text_rect.w = text_game_over->w;
@@ -428,6 +487,18 @@ int main(int argc, char **argv)
                 text_rect.y = (SCREEN_HEIGHT - text_game_over->h) / 3;
 
                 SDL_BlitSurface(text_game_over, NULL, screen, &text_rect);
+
+                if(menu.select)
+                    menu.surface = TTF_RenderText_Solid(small_font, "Retour au menu", blackcolor);
+
+                else
+                    menu.surface = TTF_RenderText_Solid(vsmall_font, "Retour au menu", blackcolor);
+
+                menu.x = (SCREEN_WIDTH-menu.surface->w) / 2;
+                menu.y = (SCREEN_HEIGHT-menu.surface->h) / 2;
+                text_rect.x = menu.x;
+                text_rect.y = menu.y;
+                SDL_BlitSurface(menu.surface, NULL, screen, &text_rect);
 
                 break;
             }
@@ -440,7 +511,7 @@ int main(int argc, char **argv)
         SDL_Delay(10);
     } // end main loop
 
-    TTF_CloseFont(small_font);
+    TTF_CloseFont(normal_font);
     TTF_CloseFont(big_font);
     SDL_FreeSurface(entity_sprites);
     SDL_FreeSurface(menu_img);
@@ -451,10 +522,13 @@ int main(int argc, char **argv)
     deleteDog(dog);
 
 	//------ Remove Score struct ------
-	delete duckScore.sprite->rect_src;
-	delete duckScore.sprite->rect_dst;
-	delete duckScore.sprite->img;
-	delete duckScore.sprite;
+    for(i = 0; i < 2; i++)
+    {
+        delete duckScore[i].sprite->rect_src;
+        delete duckScore[i].sprite->rect_dst;
+        delete duckScore[i].sprite->img;
+        delete duckScore[i].sprite;
+    }
 	//---------------------------------
 
 

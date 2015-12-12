@@ -234,7 +234,7 @@ void changeDuckAnimation(Duck &duck, int anim_type)
     }
 }
 
-void displayDuckScore(Duck &duck, Score &duckScore, SDL_Surface* screen)
+void displayDuckScore(Duck &duck, DuckScore &duckScore, SDL_Surface* screen)
 {
     if(duckScore.cooldown >= 42)
     {

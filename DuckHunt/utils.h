@@ -65,7 +65,7 @@ struct Dog
     int cooldown; //cooldown utilisé à plusieurs moments afin de faire attendre le chien
 };
 
-struct Score
+struct DuckScore
 {
     int cooldown;
     Sprite *sprite;

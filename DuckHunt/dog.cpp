@@ -145,6 +145,21 @@ void changeDogAnimation(Dog &dog, int anim_type)
 {
     switch(anim_type)
     {
+        case 0:
+            dog.nbr_sprite = 5; //dans un premier temps on met à 5 car au début du jeu lorsque le chien arrive, il n'y a que 5 animations différentes
+            dog.sprite->h = 94;
+            dog.sprite->w = 114;
+            dog.sprite->x = 0;
+            dog.sprite->y = 590 - dog.sprite->h / 2; //590 = position où doit être le chien sur l'écran
+
+            dog.sprite->x_src = 5;
+
+            dog.sprite->rect_src->h = dog.sprite->h;
+            dog.sprite->rect_src->w = dog.sprite->w;
+            dog.sprite->rect_src->x = 5;
+            dog.sprite->rect_src->y = 0;
+            break;
+
         case 1: //waiting
             dog.nbr_sprite = 1;
             dog.sprite->rect_src->x = 0;
