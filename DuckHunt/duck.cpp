@@ -131,9 +131,6 @@ void duckRandTrajectory(Duck &duck, bool colTopBottom, bool colLeftRight)
 
 void processDuck(SDL_Surface *screen, Duck &duck)
 {
-    bool colTopBottom = false; //colllision en haut et en bas de l'ecran
-    bool colLeftRight = false; //collision a gauche et a droite de l'ecran
-
     if(duck.dead && duck.cooldown > 0)
         duck.cooldown--;
 
@@ -150,32 +147,16 @@ void processDuck(SDL_Surface *screen, Duck &duck)
     }
 
     if (duck.sprite->x>(SCREEN_WIDTH-duck.sprite->w/2))
-    {
-        colTopBottom = false;
-        colLeftRight = true;
-        duckRandTrajectory(duck, colTopBottom, colLeftRight);
-    }
+        duckRandTrajectory(duck, false, true);
 
     else if (duck.sprite->x<duck.sprite->w/2)
-    {
-        colTopBottom = false;
-        colLeftRight = true;
-        duckRandTrajectory(duck, colTopBottom, colLeftRight);
-    }
+        duckRandTrajectory(duck, false, true);
 
     else if (duck.sprite->y>SCREEN_HEIGHT/2 + 120 -duck.sprite->h/2 && !duck.dead)
-    {
-        colTopBottom = true;
-        colLeftRight = false;
-        duckRandTrajectory(duck, colTopBottom, colLeftRight);
-    }
+        duckRandTrajectory(duck, true, false);
 
     else if (duck.sprite->y<duck.sprite->h/2)
-    {
-        colTopBottom = true;
-        colLeftRight = false;
-        duckRandTrajectory(duck, colTopBottom, colLeftRight);
-    }
+        duckRandTrajectory(duck, true, false);
 
     moveDuck(duck);
     showDuck(screen, duck);
@@ -198,8 +179,6 @@ bool killDuck(Duck &duck, SDL_Event &event)
 
 void moveDuck(Duck &duck)
 {
-    if(duck.mvt_y == 0)
-
     duck.sprite->x += duck.mvt_x * duck.speed;
     duck.sprite->y += duck.mvt_y * duck.speed;
 
