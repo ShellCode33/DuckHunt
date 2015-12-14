@@ -20,6 +20,7 @@ using namespace std;
 #define SCREEN_BPP 32
 
 #define NB_DUCK_PER_LEVEL 10
+#define NB_DOG_BOSS_LEVEL 10
 
 struct Sprite
 {
@@ -70,6 +71,12 @@ struct DuckScore
     int cooldown;
     Sprite *sprite;
     int alpha;
+};
+
+struct Boss
+{
+    Dog *dogs[NB_DOG_BOSS_LEVEL];
+    int floor[NB_DOG_BOSS_LEVEL]; //étage d'herbe où se trouve le chien 0=en haut, 1=au dessous, 2=etc... 3=tout en bas, 4=gameover=chien qui rigole en gros
 };
 
 SDL_Surface* loadImageWithColorKey(const char* filename, bool colorkey, int r, int g, int b);

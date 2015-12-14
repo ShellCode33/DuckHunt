@@ -6,6 +6,7 @@
 #include "duck.h"
 #include "menu.h"
 #include "level.h"
+#include "boss.h"
 
 enum Display
 {

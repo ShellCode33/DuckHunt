@@ -54,21 +54,23 @@ int main(int argc, char **argv)
 
 
 
-    Display display = MENU;
-    GameState gs = DOG;
+    Display display = GAME;
+    GameState gs = BOSS;
 
     SDL_Surface* entity_sprites = loadImageWithColorKey("res/sprites/duck.png", true, 228, 255, 0);
     SDL_Surface* background = loadImageWithColorKey("res/sprites/backGame.png", false, 0, 0, 0);
     SDL_Surface* fake_background = loadImageWithColorKey("res/sprites/backGameBlit.png", true, 0, 0, 0);
-
     SDL_Surface* menu_img = loadImageWithColorKey("res/sprites/menu.png", false, 0, 0, 0);
-
     SDL_Surface* cursor_img = loadImageWithColorKey("res/sprites/viseur.png", true, 0, 0, 0);
-
     SDL_Surface* bullet_img = loadImageWithColorKey("res/sprites/shot.png", true, 255, 255, 255);
-
     SDL_Surface* duck_hit_img = loadImageWithColorKey("res/sprites/hit.png", true, 5, 5, 5);
+    SDL_Surface* boss_bg[5];
 
+    string path_to_boss_bg = "res/sprites/boss_bg_";
+    string ext = ".png";
+
+    for(i = 0; i < 5; i++)
+        boss_bg[i] = loadImageWithColorKey((path_to_boss_bg + to_string(i) + ext).c_str(), true, 255, 255, 0);
 
     TTF_Font* vsmall_font = TTF_OpenFont("res/font/duck_hunt.ttf", 30);
     TTF_Font* small_font = TTF_OpenFont("res/font/duck_hunt.ttf", 35);
@@ -103,7 +105,6 @@ int main(int argc, char **argv)
     initDog(entity_sprites, dog);
 
     Duck duck[NB_DUCK_PER_LEVEL]; //tableau de cannards (10 par niveau)
-
     DuckScore duckScore[2]; //1 pour chaque canard
 
     for(i = 0; i < 2; i++)
@@ -116,6 +117,9 @@ int main(int argc, char **argv)
 
     for(i = 0; i < NB_DUCK_PER_LEVEL; i++)
         initDuck(entity_sprites, duck[i], levels_copy, level);
+
+    Boss boss;
+    initBoss(entity_sprites, boss);
     //------------------------------------------------------------
 
     // program main loop
@@ -467,6 +471,23 @@ int main(int argc, char **argv)
 
                     case BOSS:
                     {
+                        SDL_BlitSurface(boss_bg[0], NULL, screen, NULL);
+
+                        boss.dogs[0]->sprite->rect_dst->x = boss.dogs[0]->sprite->rect_dst->y = 55*2;
+                        SDL_BlitSurface(boss.dogs[0]->sprite->img, boss.dogs[0]->sprite->rect_src, screen, boss.dogs[0]->sprite->rect_dst);
+                        SDL_BlitSurface(boss_bg[1], NULL, screen, NULL);
+
+                        boss.dogs[1]->sprite->rect_dst->x = boss.dogs[1]->sprite->rect_dst->y = 110*2;
+                        SDL_BlitSurface(boss.dogs[1]->sprite->img, boss.dogs[1]->sprite->rect_src, screen, boss.dogs[1]->sprite->rect_dst);
+                        SDL_BlitSurface(boss_bg[2], NULL, screen, NULL);
+
+                        boss.dogs[2]->sprite->rect_dst->x = boss.dogs[2]->sprite->rect_dst->y = 165*2;
+                        SDL_BlitSurface(boss.dogs[2]->sprite->img, boss.dogs[2]->sprite->rect_src, screen, boss.dogs[2]->sprite->rect_dst);
+                        SDL_BlitSurface(boss_bg[3], NULL, screen, NULL);
+
+                        boss.dogs[3]->sprite->rect_dst->x = boss.dogs[3]->sprite->rect_dst->y = 220*2;
+                        SDL_BlitSurface(boss.dogs[3]->sprite->img, boss.dogs[3]->sprite->rect_src, screen, boss.dogs[3]->sprite->rect_dst);
+                        SDL_BlitSurface(boss_bg[4], NULL, screen, NULL);
 
                         break;
                     }
