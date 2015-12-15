@@ -228,6 +228,14 @@ void changeDuckAnimation(Duck &duck, int anim_type)
             duck.sprite->rect_src->w = duck.sprite->w;
             duck.mvt_y = 15;
             break;
+
+        case 3: //when the duck flees
+            duck.mvt_x = 3;
+            duck.mvt_y = -3;
+            duck.speed = 2.0;
+            duck.sprite->rect_src->x = duck.sprite->x_src = 222;
+            duck.sprite->h = 71;
+            duck.sprite->w = 75;
     }
 }
 
@@ -273,8 +281,9 @@ void displayDuckScore(Duck &duck, DuckScore &duckScore, SDL_Surface* screen)
 void fadeOutDuck(Duck &duck)
 {
     duck.flee = true;
-    duck.mvt_x = 3;
-    duck.mvt_y = -3;
+    duck.cooldown--;
+    if(duck.cooldown == 10)
+        changeDuckAnimation(duck, 3);
 
     if(duck.sprite->x-duck.sprite->w/2 > SCREEN_WIDTH || duck.sprite->y+duck.sprite->h/2 < 0)
         duck.displayed = false;

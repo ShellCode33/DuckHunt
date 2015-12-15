@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 
 
     Display display = GAME;
-    GameState gs = BOSS;
+    GameState gs = DUCK;
 
     SDL_Surface* entity_sprites = loadImageWithColorKey("res/sprites/duck.png", true, 228, 255, 0);
     SDL_Surface* background = loadImageWithColorKey("res/sprites/backGame.png", false, 0, 0, 0);
@@ -502,7 +502,6 @@ int main(int argc, char **argv)
             case GAME_OVER:
             {
                 SDL_BlitSurface(background, NULL, screen, &dst_background); //on affiche l'image de fond
-
                 SDL_Color background_color = {0, 193, 255, 0};
                 SDL_Color text_color = {255, 50, 50, 0};
                 string text = "Game Over";
