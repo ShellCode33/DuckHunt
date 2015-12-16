@@ -59,28 +59,10 @@ void initDuck(SDL_Surface* entity_sprites, Duck &duck, int levels[][3], int curr
     duck.displayed = true;
     duck.flee = false;
 
-    duckRandTrajectory(duck, false, false);
+    collisionAndTrajectory(duck, false, false);
 }
 
-
-
-
-/*
- *
- *                      CETTE PUTAIN DE FONCTION EST A REFAIRE ENTIEREMENT !!!
- *                                              |
- *                                              |
- *                                              |
- *                                              |
- *                                              |
- *                                              |
- *                                              |
- *                                              |
- *                                              |
- *                                              V
- */
-
-void duckRandTrajectory(Duck &duck, bool colTopBottom, bool colLeftRight)
+void collisionAndTrajectory(Duck &duck, bool colTopBottom, bool colLeftRight)
 {
     int trajectoires[] = {1, 2, 3, 4, 5, 6};
     int direction[]= {-1, 1};
@@ -93,12 +75,13 @@ void duckRandTrajectory(Duck &duck, bool colTopBottom, bool colLeftRight)
             if (duck.sprite->x > SCREEN_WIDTH/2)
             {
                 duck.mvt_x=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[0];
-                duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7+duck.mvt_x);
+                duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(6+duck.mvt_x);
             }
+
             else if (duck.sprite->x < SCREEN_WIDTH/2)
             {
                 duck.mvt_x=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[1];
-                duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7-duck.mvt_x);
+                duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(6-duck.mvt_x);
             }
         }
 
@@ -107,12 +90,13 @@ void duckRandTrajectory(Duck &duck, bool colTopBottom, bool colLeftRight)
             if (duck.sprite->y > SCREEN_HEIGHT/3)
             {
                 duck.mvt_y=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[0];
-                duck.mvt_x=direction[rand()%sizeof(direction)/sizeof(int)]*(7+duck.mvt_y);
+                duck.mvt_x=direction[rand()%sizeof(direction)/sizeof(int)]*(6+duck.mvt_y);
             }
+
             else if (duck.sprite->y < SCREEN_HEIGHT/2)
             {
                 duck.mvt_y=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[1];
-                duck.mvt_x=direction[rand()%sizeof(direction)/sizeof(int)]*(7-duck.mvt_y);
+                duck.mvt_x=direction[rand()%sizeof(direction)/sizeof(int)]*(6-duck.mvt_y);
             }
         }
 
@@ -121,11 +105,17 @@ void duckRandTrajectory(Duck &duck, bool colTopBottom, bool colLeftRight)
             duck.mvt_x=trajectoires[rand()%sizeof(trajectoires)/sizeof(int)]*direction[rand()%sizeof(direction)/sizeof(int)];
 
             if (duck.mvt_x > 0)
-                duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7-duck.mvt_x);
+                duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(6-duck.mvt_x);
 
             else if (duck.mvt_x < 0)
-                duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(7+duck.mvt_x);
+                duck.mvt_y=direction[rand()%sizeof(direction)/sizeof(int)]*(6+duck.mvt_x);
         }
+
+        if(duck.mvt_x < 0)
+            changeDuckAnimation(duck, 4);
+
+        else if(duck.mvt_x > 0)
+            changeDuckAnimation(duck, 5);
     }
 }
 
@@ -147,16 +137,16 @@ void processDuck(SDL_Surface *screen, Duck &duck)
     }
 
     if (duck.sprite->x>(SCREEN_WIDTH-duck.sprite->w/2))
-        duckRandTrajectory(duck, false, true);
+        collisionAndTrajectory(duck, false, true);
 
     else if (duck.sprite->x<duck.sprite->w/2)
-        duckRandTrajectory(duck, false, true);
+        collisionAndTrajectory(duck, false, true);
 
     else if (duck.sprite->y>SCREEN_HEIGHT/2 + 120 -duck.sprite->h/2 && !duck.dead)
-        duckRandTrajectory(duck, true, false);
+        collisionAndTrajectory(duck, true, false);
 
     else if (duck.sprite->y<duck.sprite->h/2)
-        duckRandTrajectory(duck, true, false);
+        collisionAndTrajectory(duck, true, false);
 
     moveDuck(duck);
     showDuck(screen, duck);
@@ -236,6 +226,15 @@ void changeDuckAnimation(Duck &duck, int anim_type)
             duck.sprite->rect_src->x = duck.sprite->x_src = 222;
             duck.sprite->h = 71;
             duck.sprite->w = 75;
+            break;
+
+        case 4: //makes the duck look to the left
+            duck.sprite->rect_src->x = duck.sprite->x_src = 635;
+            break;
+
+        case 5: //makes the duck look to the right
+            duck.sprite->rect_src->x = duck.sprite->x_src = 12;
+            break;
     }
 }
 

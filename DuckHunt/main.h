@@ -8,6 +8,7 @@
 #include "level.h"
 #include "boss.h"
 
+
 enum Display
 {
     MENU,

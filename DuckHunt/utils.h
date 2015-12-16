@@ -13,6 +13,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <string>
+#include <fstream>
 using namespace std;
 
 #define SCREEN_WIDTH 750
@@ -21,6 +22,8 @@ using namespace std;
 
 #define NB_DUCK_PER_LEVEL 10
 #define NB_DOG_BOSS_LEVEL 10
+
+#define MAX_LENGTH_USERNAME 10
 
 struct Sprite
 {
@@ -73,6 +76,12 @@ struct DuckScore
     int alpha;
 };
 
+struct Player
+{
+    string name;
+    int score;
+};
+
 struct Boss
 {
     Dog *dogs[NB_DOG_BOSS_LEVEL];
@@ -83,6 +92,8 @@ SDL_Surface* loadImageWithColorKey(const char* filename, bool colorkey, int r, i
 void displayBulletLeft(SDL_Surface *screen, SDL_Surface *bullet_img, int bullet_left);
 void displayScore(SDL_Surface *screen, TTF_Font* font, int score);
 void displayDuckHit(SDL_Surface *screen, Duck duck[], int current_wave, SDL_Surface *duck_hit_img);
+void sortBestScores(Player bestScores[], Player lastPlayer);
+
 
 
 #endif

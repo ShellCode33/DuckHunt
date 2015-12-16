@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 
 
     Display display = GAME;
-    GameState gs = DUCK;
+    GameState gs = DOG;
 
     SDL_Surface* entity_sprites = loadImageWithColorKey("res/sprites/duck.png", true, 228, 255, 0);
     SDL_Surface* background = loadImageWithColorKey("res/sprites/backGame.png", false, 0, 0, 0);
@@ -65,6 +65,8 @@ int main(int argc, char **argv)
     SDL_Surface* bullet_img = loadImageWithColorKey("res/sprites/shot.png", true, 255, 255, 255);
     SDL_Surface* duck_hit_img = loadImageWithColorKey("res/sprites/hit.png", true, 5, 5, 5);
     SDL_Surface* boss_bg[5];
+    SDL_Surface *user_name = NULL;
+
 
     string path_to_boss_bg = "res/sprites/boss_bg_";
     string ext = ".png";
@@ -90,16 +92,22 @@ int main(int argc, char **argv)
     quit.y = SCREEN_HEIGHT/2;
     quit.select = false;
 
-    Button menu; //bouton de retour au menu lorsque Game Over
-    menu.surface = TTF_RenderText_Solid(vsmall_font, "Retour au menu", blackcolor);
-    menu.x = SCREEN_WIDTH / 2;
-    menu.y = SCREEN_HEIGHT / 2;
-    menu.select = false;
+    Button ok; //bouton de retour au menu lorsque Game Over
+    ok.surface = TTF_RenderText_Solid(vsmall_font, "Retour au menu", blackcolor);
+    ok.x = SCREEN_WIDTH / 2;
+    ok.y = SCREEN_HEIGHT / 2;
+    ok.select = false;
 
     SDL_Rect dst_background;
     dst_background.x = dst_background.y = 0;
     dst_background.w = background->w;
     dst_background.h = background->h;
+
+    SDL_Rect user_name_dst;
+    user_name_dst.w = SCREEN_WIDTH / 4;
+    user_name_dst.h = 35;
+    user_name_dst.x = (SCREEN_WIDTH) / 2 - user_name_dst.w;
+    user_name_dst.y = (SCREEN_HEIGHT) / 3;
 
     Dog dog;
     initDog(entity_sprites, dog);
@@ -120,6 +128,14 @@ int main(int argc, char **argv)
 
     Boss boss;
     initBoss(entity_sprites, boss);
+
+    Player current_user;
+    current_user.name = "Pseudo: _ _ _ _ _ _ _ _ _";
+    int nb_lettres_entrees = 0;
+
+    Player bestScores[5];
+    bool nameEntered = false; //booléen qui test si le nom du joueur a été entré à la fin
+
     //------------------------------------------------------------
 
     // program main loop
@@ -167,16 +183,38 @@ int main(int argc, char **argv)
 
             else if(display == GAME_OVER)
             {
-                if(event.motion.x < (menu.x + menu.surface->w) && event.motion.x > menu.x && event.motion.y < (menu.y + menu.surface->h) && event.motion.y > menu.y)
+                if(event.motion.x < (ok.x + ok.surface->w) && event.motion.x > ok.x && event.motion.y < (ok.y + ok.surface->h) && event.motion.y > ok.y)
                 {
-                    menu.select = true;
+                    ok.select = true;
 
                     if(event.type == SDL_MOUSEBUTTONDOWN)
+                    {
                         display = MENU;
+                        nameEntered = true;
+                    }
                 }
 
                 else
-                    menu.select = false;
+                    ok.select = false;
+
+                if(event.type == SDL_KEYDOWN && nb_lettres_entrees <= MAX_LENGTH_USERNAME)
+                {
+                    if(event.key.keysym.sym == SDLK_BACKSPACE && nb_lettres_entrees > 0)
+                    {
+                        nb_lettres_entrees--;
+                        current_user.name.replace(8+(nb_lettres_entrees)*2, 1, "_");
+                    }
+
+                    else if(nb_lettres_entrees < MAX_LENGTH_USERNAME-1)
+                    {
+                        string key = "";
+                        key += event.key.keysym.sym;
+                        current_user.name.replace(8+nb_lettres_entrees*2, 1, key.c_str());
+                        nb_lettres_entrees++;
+                    }
+                }
+
+                user_name = TTF_RenderText_Solid(small_font, current_user.name.c_str(), blackcolor);
             }
 
             else if(event.type == SDL_MOUSEBUTTONDOWN && display == GAME && gs == DUCK && bullet_left > 0)
@@ -512,21 +550,32 @@ int main(int argc, char **argv)
                 text_rect.w = text_game_over->w;
                 text_rect.h = text_game_over->h;
                 text_rect.x = (SCREEN_WIDTH - text_game_over->w) / 2;
-                text_rect.y = (SCREEN_HEIGHT - text_game_over->h) / 3;
+                text_rect.y = (SCREEN_HEIGHT - text_game_over->h) / 4;
 
                 SDL_BlitSurface(text_game_over, NULL, screen, &text_rect);
+                if(user_name != NULL)
+                    SDL_BlitSurface(user_name, NULL, screen, &user_name_dst);
 
-                if(menu.select)
-                    menu.surface = TTF_RenderText_Solid(small_font, "Retour au menu", blackcolor);
+
+                if(ok.select)
+                {
+                    ok.surface = TTF_RenderText_Solid(small_font, "Ok", blackcolor);
+
+                    if(nameEntered)
+                        sortBestScores(bestScores, current_user);
+                }
 
                 else
-                    menu.surface = TTF_RenderText_Solid(vsmall_font, "Retour au menu", blackcolor);
+                    ok.surface = TTF_RenderText_Solid(vsmall_font, "Ok", blackcolor);
 
-                menu.x = (SCREEN_WIDTH-menu.surface->w) / 2;
-                menu.y = (SCREEN_HEIGHT-menu.surface->h) / 2;
-                text_rect.x = menu.x;
-                text_rect.y = menu.y;
-                SDL_BlitSurface(menu.surface, NULL, screen, &text_rect);
+
+                ok.x = (SCREEN_WIDTH-ok.surface->w) / 2;
+                ok.y = (SCREEN_HEIGHT-ok.surface->h) / 2;
+                text_rect.x = ok.x;
+                text_rect.y = ok.y;
+                SDL_BlitSurface(ok.surface, NULL, screen, &text_rect);
+
+
 
                 break;
             }
