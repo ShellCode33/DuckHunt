@@ -40,22 +40,31 @@ void displayBulletLeft(SDL_Surface *screen, SDL_Surface *bullet_img, int bullet_
     SDL_BlitSurface(bullet_img, &rect_src, screen, &rect_dst);
 }
 
-void displayScore(SDL_Surface *screen, TTF_Font *font, int score)
+void displayScore(SDL_Surface *screen, TTF_Font *font, int score, int mode)
 {
     SDL_Color blackcolor = {0, 0, 0, 0};
     SDL_Color whitecolor = {255, 255, 255, 0};
 
     string score_str = "";
+
+    if(mode == 2)
+        score_str += "Score: ";
+
     score_str += to_string(score);
 
     SDL_Surface *text_score = TTF_RenderText_Shaded(font, score_str.c_str(), whitecolor, blackcolor);
 
     SDL_Rect rect_dst;
-    rect_dst.x = 560;
+
+    if(mode == 1) //mode 1 correspond au mode de jeu normal
+        rect_dst.x = 560;
+
+    else if(mode == 2) //mode 2 correspond au boss
+        rect_dst.x = (SCREEN_WIDTH-text_score->w) / 2;
+
     rect_dst.y = 683 - text_score->h / 2;
     rect_dst.w = text_score->w;
     rect_dst.h = text_score->h;
-
     SDL_BlitSurface(text_score, NULL, screen, &rect_dst);
 }
 
@@ -160,6 +169,4 @@ void sortBestScores(Player bestScores[], Player lastPlayer) //pas encore fonctio
 
     }
 }
-
-
 

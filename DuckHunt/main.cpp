@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 
 
     Display display = GAME;
-    GameState gs = DOG;
+    GameState gs = BOSS;
 
     SDL_Surface* entity_sprites = loadImageWithColorKey("res/sprites/duck.png", true, 228, 255, 0);
     SDL_Surface* background = loadImageWithColorKey("res/sprites/backGame.png", false, 0, 0, 0);
@@ -64,9 +64,8 @@ int main(int argc, char **argv)
     SDL_Surface* cursor_img = loadImageWithColorKey("res/sprites/viseur.png", true, 0, 0, 0);
     SDL_Surface* bullet_img = loadImageWithColorKey("res/sprites/shot.png", true, 255, 255, 255);
     SDL_Surface* duck_hit_img = loadImageWithColorKey("res/sprites/hit.png", true, 5, 5, 5);
+    SDL_Surface* sniper = loadImageWithColorKey("res/sprites/sniper_target.png", true, 255, 255, 255);
     SDL_Surface* boss_bg[5];
-    SDL_Surface *user_name = NULL;
-
 
     string path_to_boss_bg = "res/sprites/boss_bg_";
     string ext = ".png";
@@ -93,21 +92,22 @@ int main(int argc, char **argv)
     quit.select = false;
 
     Button ok; //bouton de retour au menu lorsque Game Over
-    ok.surface = TTF_RenderText_Solid(vsmall_font, "Retour au menu", blackcolor);
+    ok.surface = TTF_RenderText_Solid(vsmall_font, "Ok", blackcolor);
     ok.x = SCREEN_WIDTH / 2;
     ok.y = SCREEN_HEIGHT / 2;
     ok.select = false;
-
-    SDL_Rect dst_background;
-    dst_background.x = dst_background.y = 0;
-    dst_background.w = background->w;
-    dst_background.h = background->h;
 
     SDL_Rect user_name_dst;
     user_name_dst.w = SCREEN_WIDTH / 4;
     user_name_dst.h = 35;
     user_name_dst.x = (SCREEN_WIDTH) / 2 - user_name_dst.w;
     user_name_dst.y = (SCREEN_HEIGHT) / 3;
+
+
+    SDL_Rect dst_background;
+    dst_background.x = dst_background.y = 0;
+    dst_background.w = background->w;
+    dst_background.h = background->h;
 
     Dog dog;
     initDog(entity_sprites, dog);
@@ -129,6 +129,7 @@ int main(int argc, char **argv)
     Boss boss;
     initBoss(entity_sprites, boss);
 
+    SDL_Surface *user_name = NULL;
     Player current_user;
     current_user.name = "Pseudo: _ _ _ _ _ _ _ _ _";
     int nb_lettres_entrees = 0;
@@ -240,6 +241,12 @@ int main(int argc, char **argv)
                 bullet_left--;
             }
 
+            else if(display == GAME && gs == BOSS && event.type == SDL_MOUSEBUTTONDOWN)
+            {
+                if(killBoss(boss, event.motion.x, event.motion.y))
+                    score += 500;
+            }
+
         } // end of message processing
 
         // clear screen
@@ -318,7 +325,7 @@ int main(int argc, char **argv)
                         //Afficher les infos "balles restantes" "score" et "canards tués ou non"
                         displayBulletLeft(screen, bullet_img, bullet_left);
 
-                        displayScore(screen, vsmall_font, score);
+                        displayScore(screen, vsmall_font, score, 1);
 
                         displayDuckHit(screen, duck, current_wave, duck_hit_img);
 
@@ -509,23 +516,66 @@ int main(int argc, char **argv)
 
                     case BOSS:
                     {
-                        SDL_BlitSurface(boss_bg[0], NULL, screen, NULL);
+                        int dog_index;
+                        for(dog_index = 0; dog_index < NB_DOG_BOSS_LEVEL; dog_index++)
+                        {
+                            if(processBoss(boss, dog_index))
+                                display = GAME_OVER;
 
-                        boss.dogs[0]->sprite->rect_dst->x = boss.dogs[0]->sprite->rect_dst->y = 55*2;
-                        SDL_BlitSurface(boss.dogs[0]->sprite->img, boss.dogs[0]->sprite->rect_src, screen, boss.dogs[0]->sprite->rect_dst);
-                        SDL_BlitSurface(boss_bg[1], NULL, screen, NULL);
+                            else
+                                moveBoss(boss, dog_index);
+                        }
 
-                        boss.dogs[1]->sprite->rect_dst->x = boss.dogs[1]->sprite->rect_dst->y = 110*2;
-                        SDL_BlitSurface(boss.dogs[1]->sprite->img, boss.dogs[1]->sprite->rect_src, screen, boss.dogs[1]->sprite->rect_dst);
-                        SDL_BlitSurface(boss_bg[2], NULL, screen, NULL);
+                        displayBoss(screen, boss, boss_bg);
+                        displayScore(screen, vsmall_font, score, 2);
 
-                        boss.dogs[2]->sprite->rect_dst->x = boss.dogs[2]->sprite->rect_dst->y = 165*2;
-                        SDL_BlitSurface(boss.dogs[2]->sprite->img, boss.dogs[2]->sprite->rect_src, screen, boss.dogs[2]->sprite->rect_dst);
-                        SDL_BlitSurface(boss_bg[3], NULL, screen, NULL);
+                        //On affiche la cible de sniper
+                        int x_mouse, y_mouse;
+                        SDL_GetMouseState(&x_mouse, &y_mouse);
 
-                        boss.dogs[3]->sprite->rect_dst->x = boss.dogs[3]->sprite->rect_dst->y = 220*2;
-                        SDL_BlitSurface(boss.dogs[3]->sprite->img, boss.dogs[3]->sprite->rect_src, screen, boss.dogs[3]->sprite->rect_dst);
-                        SDL_BlitSurface(boss_bg[4], NULL, screen, NULL);
+                        SDL_Rect sniper_pos;
+                        sniper_pos.x = x_mouse - 150;
+                        sniper_pos.y = y_mouse - 150;
+                        sniper_pos.h = sniper_pos.w = 300;
+
+                        SDL_BlitSurface(sniper, NULL, screen, &sniper_pos); //on affiche l'image de la cible à la position de la souris
+                        //-----------------------------
+
+                        //On affiche du noir partout autour du sniper
+
+                        SDL_Rect dark_pos;
+                        dark_pos.w = x_mouse-150;
+                        dark_pos.h = SCREEN_HEIGHT;
+                        dark_pos.x = 0;
+                        dark_pos.y = 0;
+
+                        if(x_mouse > 150)
+                            SDL_FillRect(screen, &dark_pos, SDL_MapRGB(screen->format, 0, 0, 0));
+
+                        dark_pos.w = SCREEN_WIDTH-(x_mouse+150);
+                        dark_pos.x = x_mouse+150;
+
+                        if(x_mouse < SCREEN_WIDTH-150)
+                            SDL_FillRect(screen, &dark_pos, SDL_MapRGB(screen->format, 0, 0, 0));
+
+                        dark_pos.w = SCREEN_WIDTH;
+                        dark_pos.h = y_mouse-150;
+                        dark_pos.x = 0;
+                        dark_pos.y = 0;
+
+                        if(y_mouse > 150)
+                            SDL_FillRect(screen, &dark_pos, SDL_MapRGB(screen->format, 0, 0, 0));
+
+
+                        dark_pos.y = y_mouse+150;
+                        dark_pos.w = SCREEN_WIDTH;
+                        dark_pos.h = SCREEN_HEIGHT-(y_mouse+150);
+
+                        if(y_mouse < SCREEN_HEIGHT-150)
+                            SDL_FillRect(screen, &dark_pos, SDL_MapRGB(screen->format, 0, 0, 0));
+
+                        //-------------------------------------------
+
 
                         break;
                     }
@@ -550,9 +600,10 @@ int main(int argc, char **argv)
                 text_rect.w = text_game_over->w;
                 text_rect.h = text_game_over->h;
                 text_rect.x = (SCREEN_WIDTH - text_game_over->w) / 2;
-                text_rect.y = (SCREEN_HEIGHT - text_game_over->h) / 4;
+                text_rect.y = (SCREEN_HEIGHT - text_game_over->h) / 3;
 
                 SDL_BlitSurface(text_game_over, NULL, screen, &text_rect);
+
                 if(user_name != NULL)
                     SDL_BlitSurface(user_name, NULL, screen, &user_name_dst);
 
@@ -574,8 +625,6 @@ int main(int argc, char **argv)
                 text_rect.x = ok.x;
                 text_rect.y = ok.y;
                 SDL_BlitSurface(ok.surface, NULL, screen, &text_rect);
-
-
 
                 break;
             }

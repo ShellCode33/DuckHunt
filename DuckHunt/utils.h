@@ -13,7 +13,6 @@
 #include <time.h>
 #include <stdio.h>
 #include <string>
-#include <fstream>
 using namespace std;
 
 #define SCREEN_WIDTH 750
@@ -21,7 +20,7 @@ using namespace std;
 #define SCREEN_BPP 32
 
 #define NB_DUCK_PER_LEVEL 10
-#define NB_DOG_BOSS_LEVEL 10
+#define NB_DOG_BOSS_LEVEL 9
 
 #define MAX_LENGTH_USERNAME 10
 
@@ -76,24 +75,24 @@ struct DuckScore
     int alpha;
 };
 
+struct Boss
+{
+    Dog *dogs[NB_DOG_BOSS_LEVEL];
+    int floor[NB_DOG_BOSS_LEVEL]; //étage d'herbe où se trouve le chien 0=en haut, 1=au dessous, 2=etc... 3=tout en bas, 4=gameover=chien qui rigole en gros
+    int index[NB_DOG_BOSS_LEVEL]; //place sur l'étage
+    bool dead[NB_DOG_BOSS_LEVEL];
+};
+
 struct Player
 {
     string name;
     int score;
 };
 
-struct Boss
-{
-    Dog *dogs[NB_DOG_BOSS_LEVEL];
-    int floor[NB_DOG_BOSS_LEVEL]; //étage d'herbe où se trouve le chien 0=en haut, 1=au dessous, 2=etc... 3=tout en bas, 4=gameover=chien qui rigole en gros
-};
-
 SDL_Surface* loadImageWithColorKey(const char* filename, bool colorkey, int r, int g, int b);
 void displayBulletLeft(SDL_Surface *screen, SDL_Surface *bullet_img, int bullet_left);
-void displayScore(SDL_Surface *screen, TTF_Font* font, int score);
+void displayScore(SDL_Surface *screen, TTF_Font* font, int score, int mode);
 void displayDuckHit(SDL_Surface *screen, Duck duck[], int current_wave, SDL_Surface *duck_hit_img);
 void sortBestScores(Player bestScores[], Player lastPlayer);
-
-
 
 #endif
