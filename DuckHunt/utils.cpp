@@ -125,7 +125,7 @@ void displayDuckHit(SDL_Surface *screen, Duck duck[], int current_wave, SDL_Surf
         dst_rect.x += dst_rect.w + 3;
     }
 }
-
+/*
 void sortBestScores(Player bestScores[], Player lastPlayer) //pas encore fonctionnel
 {
     int i =0;
@@ -169,4 +169,4 @@ void sortBestScores(Player bestScores[], Player lastPlayer) //pas encore fonctio
 
     }
 }
-
+*/

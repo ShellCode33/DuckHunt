@@ -2,9 +2,10 @@
 
 int main(int argc, char **argv)
 {
+    //easter egg
     if(argc == 2)
     {
-        //easter egg ?
+        printf("Not yet implemented ;)\n");
     }
 
     // initialize SDL video
@@ -40,6 +41,7 @@ int main(int argc, char **argv)
     int current_wave = 1; //contient la vague courrante, 1 vague = 2 canards, il y a 5 vagues par niveau
     bool wave_finished = false; //Permet de savoir quand afficher le chien qui rigole ou alors celui avec les canards dans la/les main(s)
     bool new_level = true; //Permet de savoir si on démarre un nouveau niveau afin de ne pas afficher le niveau à chaque fin de wave
+    bool boss_coming = false; //permet de savoir quand passer au boss
     bool duckIsDead1 = false, duckIsDead2 = false;
     int level = 1; //niveau courant en commencant la partie
     int bullet_left = 3;
@@ -54,8 +56,8 @@ int main(int argc, char **argv)
 
 
 
-    Display display = GAME;
-    GameState gs = BOSS;
+    Display display = MENU;
+    GameState gs = DOG;
 
     SDL_Surface* entity_sprites = loadImageWithColorKey("res/sprites/duck.png", true, 228, 255, 0);
     SDL_Surface* background = loadImageWithColorKey("res/sprites/backGame.png", false, 0, 0, 0);
@@ -270,7 +272,10 @@ int main(int argc, char **argv)
                     {
                         processDog(screen, dog);
 
-                        if(!dog.state && new_level)
+                        if(!dog.state && boss_coming)
+                            gs = BOSS;
+
+                        else if(!dog.state && new_level)
                             gs = LEVEL;
 
                         else if(!dog.state)
@@ -472,7 +477,7 @@ int main(int argc, char **argv)
                                 new_level = true;
 
                                 if(level > 5)
-                                    gs = BOSS;
+                                    boss_coming = true;
                             }
 
                             //Si la vague est terminée mais que pas assez de canards ont été tués, alors on affiche gameover
@@ -613,7 +618,7 @@ int main(int argc, char **argv)
                     ok.surface = TTF_RenderText_Solid(small_font, "Ok", blackcolor);
 
                     if(nameEntered)
-                        sortBestScores(bestScores, current_user);
+                        ;//sortBestScores(bestScores, current_user);
                 }
 
                 else
