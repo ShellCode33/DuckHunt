@@ -1,6 +1,6 @@
 #include "boss.h"
 
-void initBoss(SDL_Surface* entity_sprites, Boss &boss)
+void initBoss(SDL_Surface* entity_sprites, Boss &boss, int current_wave)
 {
     int i;
     for(i = 0; i < NB_DOG_BOSS_LEVEL; i++)
@@ -21,7 +21,13 @@ void initBoss(SDL_Surface* entity_sprites, Boss &boss)
         boss.dogs[i]->sprite->y = boss.dogs[i]->sprite->rect_dst->y = 110;
 
         boss.floor[i] = 0;
-        boss.dogs[i]->cooldown = 80;
+
+        if(current_wave > 4)
+            boss.dogs[i]->cooldown = 25;
+
+        else
+            boss.dogs[i]->cooldown = 35-current_wave;
+
         boss.dead[i] = false;
     }
 }
@@ -50,16 +56,16 @@ void moveBoss(Boss &boss, int dog_index)
     boss.dogs[dog_index]->mvt_y = 0;
 }
 
-int processBoss(Boss &boss, int dog_index)
+int processBoss(Boss &boss, int dog_index, int current_wave)
 {
-    if(boss.dogs[dog_index]->cooldown > 60)
+    if(boss.dogs[dog_index]->cooldown > 25)
     {
-        boss.dogs[dog_index]->mvt_y = -1;
+        boss.dogs[dog_index]->mvt_y = -2;
     }
 
     else if(boss.dogs[dog_index]->cooldown > 0)
     {
-        boss.dogs[dog_index]->mvt_y = 1;
+        boss.dogs[dog_index]->mvt_y = 2;
     }
 
     if(boss.dogs[dog_index]->cooldown > 0)
@@ -68,7 +74,12 @@ int processBoss(Boss &boss, int dog_index)
     else
     {
         //les lignes qui suivent correspondent à une changement d'étage
-        boss.dogs[dog_index]->cooldown = 80;
+        if(current_wave > 4)
+            boss.dogs[dog_index]->cooldown = 25;
+
+        else
+            boss.dogs[dog_index]->cooldown = 35-current_wave;
+
         boss.floor[dog_index]++;
         boss.dogs[dog_index]->sprite->rect_dst->y = 110*(boss.floor[dog_index]+1);
     }
@@ -94,4 +105,16 @@ int killBoss(Boss &boss, int x_mouse, int y_mouse)
     }
 
     return 0;
+}
+
+void deleteBoss(Boss &boss)
+{
+    int i;
+    for(i = 0; i < NB_DOG_BOSS_LEVEL; i++)
+    {
+        delete boss.dogs[i]->sprite->rect_dst;
+        delete boss.dogs[i]->sprite->rect_src;
+        delete boss.dogs[i]->sprite;
+        delete boss.dogs[i];
+    }
 }

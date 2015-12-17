@@ -38,7 +38,7 @@ int main(int argc, char **argv)
     //-------------------- init variables ------------------------
 
     int score = 0;
-    int current_wave = 1; //contient la vague courrante, 1 vague = 2 canards, il y a 5 vagues par niveau
+    int current_wave = 1; //contient la vague courrante, 1 vague = 2 canards, il y a 5 vagues par niveau, cette variable est aussi utilisée pour le boss, afin de faire une vitesse (et donc une difficulté) croissante
     bool wave_finished = false; //Permet de savoir quand afficher le chien qui rigole ou alors celui avec les canards dans la/les main(s)
     bool new_level = true; //Permet de savoir si on démarre un nouveau niveau afin de ne pas afficher le niveau à chaque fin de wave
     bool boss_coming = false; //permet de savoir quand passer au boss
@@ -56,8 +56,8 @@ int main(int argc, char **argv)
 
 
 
-    Display display = GAME_OVER;
-    GameState gs = DOG;
+    Display display = GAME;
+    GameState gs = BOSS;
 
     SDL_Surface* entity_sprites = loadImageWithColorKey("res/sprites/duck.png", true, 228, 255, 0);
     SDL_Surface* background = loadImageWithColorKey("res/sprites/backGame.png", false, 0, 0, 0);
@@ -67,6 +67,9 @@ int main(int argc, char **argv)
     SDL_Surface* bullet_img = loadImageWithColorKey("res/sprites/shot.png", true, 255, 255, 255);
     SDL_Surface* duck_hit_img = loadImageWithColorKey("res/sprites/hit.png", true, 5, 5, 5);
     SDL_Surface* sniper = loadImageWithColorKey("res/sprites/sniper_target.png", true, 255, 255, 255);
+    SDL_Surface* big_dog = loadImageWithColorKey("res/sprites/big_dog.png", true, 228, 255, 0);
+    bool big_dog_laughing = false; //utilisé pour afficher le gros chien lorsqu'il y a game over durant le boss
+
     SDL_Surface* boss_bg[5];
 
     string path_to_boss_bg = "res/sprites/boss_bg_";
@@ -111,6 +114,18 @@ int main(int argc, char **argv)
     dst_background.w = background->w;
     dst_background.h = background->h;
 
+    SDL_Rect big_dog_dst, big_dog_src;
+    big_dog_dst.w = 464;
+    big_dog_dst.h = 624;
+    big_dog_dst.x = (SCREEN_WIDTH - big_dog_dst.w) / 2;
+    big_dog_dst.y = SCREEN_HEIGHT;
+
+    big_dog_src.w = 464;
+    big_dog_src.h = 624;
+    big_dog_src.x = 0;
+    big_dog_src.y = 0;
+
+
     Dog dog;
     initDog(entity_sprites, dog);
 
@@ -129,7 +144,7 @@ int main(int argc, char **argv)
         initDuck(entity_sprites, duck[i], levels_copy, level);
 
     Boss boss;
-    initBoss(entity_sprites, boss);
+    initBoss(entity_sprites, boss, current_wave);
 
     SDL_Surface *user_name = NULL;
     Player current_user;
@@ -521,66 +536,122 @@ int main(int argc, char **argv)
 
                     case BOSS:
                     {
-                        int dog_index;
-                        for(dog_index = 0; dog_index < NB_DOG_BOSS_LEVEL; dog_index++)
+                        if(big_dog_laughing)
                         {
-                            if(processBoss(boss, dog_index))
-                                display = GAME_OVER;
+                            SDL_BlitSurface(boss_bg[0], NULL, screen, NULL); //on raffiche le bg
 
-                            else
-                                moveBoss(boss, dog_index);
+                            if(boss.dogs[0]->cooldown > 200) //le chien monte
+                            {
+                                big_dog_dst.y -= 5;
+                            }
+
+                            else if(boss.dogs[0]->cooldown < 100 && boss.dogs[0]->cooldown > 0) //le chien descend
+                            {
+                                big_dog_dst.y += 5;
+                            }
+
+                            else if(boss.dogs[0]->cooldown <= 0)
+                            {
+                                display = GAME_OVER;
+                                big_dog_laughing = false;
+                            }
+
+                            int mod_sprite = boss.dogs[0]->cooldown % 8;
+
+                            if(mod_sprite <= 3) //1er sprite
+                                big_dog_src.x = 0;
+
+                            else //2eme sprite
+                                big_dog_src.x = 496;
+
+                            if(boss.dogs[0]->cooldown > 0)
+                                boss.dogs[0]->cooldown--;
+
+                            displayScore(screen, vsmall_font, score, 2);
+                            SDL_BlitSurface(big_dog, &big_dog_src, screen, &big_dog_dst);
                         }
 
-                        displayBoss(screen, boss, boss_bg);
-                        displayScore(screen, vsmall_font, score, 2);
+                        else
+                        {
+                            int dog_index;
+                            for(dog_index = 0; dog_index < NB_DOG_BOSS_LEVEL; dog_index++)
+                            {
+                                if(processBoss(boss, dog_index, current_wave))
+                                {
+                                    boss.dogs[0]->cooldown = 300; //On se sert du cooldown du premier chien pour le big_dog qui rigole
+                                    big_dog_laughing = true;
+                                    current_wave = 1;
+                                }
 
-                        //On affiche la cible de sniper
-                        int x_mouse, y_mouse;
-                        SDL_GetMouseState(&x_mouse, &y_mouse);
+                                else
+                                    moveBoss(boss, dog_index);
+                            }
 
-                        SDL_Rect sniper_pos;
-                        sniper_pos.x = x_mouse - 150;
-                        sniper_pos.y = y_mouse - 150;
-                        sniper_pos.h = sniper_pos.w = 300;
+                            displayBoss(screen, boss, boss_bg);
+                            displayScore(screen, vsmall_font, score, 2);
 
-                        SDL_BlitSurface(sniper, NULL, screen, &sniper_pos); //on affiche l'image de la cible à la position de la souris
-                        //-----------------------------
+                            bool allDead = true;
 
-                        //On affiche du noir partout autour du sniper
+                            for(i = 0; i < NB_DOG_BOSS_LEVEL && allDead; i++)
+                                if(!boss.dead[i])
+                                    allDead = false;
 
-                        SDL_Rect dark_pos;
-                        dark_pos.w = x_mouse-150;
-                        dark_pos.h = SCREEN_HEIGHT;
-                        dark_pos.x = 0;
-                        dark_pos.y = 0;
+                            //S'il sont tous morts, il faut lancer une nouvelle "vague"
+                            if(allDead)
+                            {
+                                //On reset
+                                deleteBoss(boss);
+                                initBoss(entity_sprites, boss, current_wave);
+                                current_wave++;
+                            }
 
-                        if(x_mouse > 150)
-                            SDL_FillRect(screen, &dark_pos, SDL_MapRGB(screen->format, 0, 0, 0));
+                            //On affiche la cible de sniper
+                            int x_mouse, y_mouse;
+                            SDL_GetMouseState(&x_mouse, &y_mouse);
 
-                        dark_pos.w = SCREEN_WIDTH-(x_mouse+150);
-                        dark_pos.x = x_mouse+150;
+                            SDL_Rect sniper_pos;
+                            sniper_pos.x = x_mouse - 150;
+                            sniper_pos.y = y_mouse - 150;
+                            sniper_pos.h = sniper_pos.w = 300;
 
-                        if(x_mouse < SCREEN_WIDTH-150)
-                            SDL_FillRect(screen, &dark_pos, SDL_MapRGB(screen->format, 0, 0, 0));
+                            SDL_BlitSurface(sniper, NULL, screen, &sniper_pos); //on affiche l'image de la cible à la position de la souris
+                            //-----------------------------
 
-                        dark_pos.w = SCREEN_WIDTH;
-                        dark_pos.h = y_mouse-150;
-                        dark_pos.x = 0;
-                        dark_pos.y = 0;
+                            //On affiche du noir partout autour du sniper
 
-                        if(y_mouse > 150)
-                            SDL_FillRect(screen, &dark_pos, SDL_MapRGB(screen->format, 0, 0, 0));
+                            SDL_Rect dark_pos;
+                            dark_pos.w = x_mouse-150;
+                            dark_pos.h = SCREEN_HEIGHT;
+                            dark_pos.x = 0;
+                            dark_pos.y = 0;
+
+                            if(x_mouse > 150)
+                                SDL_FillRect(screen, &dark_pos, SDL_MapRGB(screen->format, 0, 0, 0));
+
+                            dark_pos.w = SCREEN_WIDTH-(x_mouse+150);
+                            dark_pos.x = x_mouse+150;
+
+                            if(x_mouse < SCREEN_WIDTH-150)
+                                SDL_FillRect(screen, &dark_pos, SDL_MapRGB(screen->format, 0, 0, 0));
+
+                            dark_pos.w = SCREEN_WIDTH;
+                            dark_pos.h = y_mouse-150;
+                            dark_pos.x = 0;
+                            dark_pos.y = 0;
+
+                            if(y_mouse > 150)
+                                SDL_FillRect(screen, &dark_pos, SDL_MapRGB(screen->format, 0, 0, 0));
 
 
-                        dark_pos.y = y_mouse+150;
-                        dark_pos.w = SCREEN_WIDTH;
-                        dark_pos.h = SCREEN_HEIGHT-(y_mouse+150);
+                            dark_pos.y = y_mouse+150;
+                            dark_pos.w = SCREEN_WIDTH;
+                            dark_pos.h = SCREEN_HEIGHT-(y_mouse+150);
 
-                        if(y_mouse < SCREEN_HEIGHT-150)
-                            SDL_FillRect(screen, &dark_pos, SDL_MapRGB(screen->format, 0, 0, 0));
+                            if(y_mouse < SCREEN_HEIGHT-150)
+                                SDL_FillRect(screen, &dark_pos, SDL_MapRGB(screen->format, 0, 0, 0));
 
-                        //-------------------------------------------
-
+                            //-------------------------------------------
+                        }
 
                         break;
                     }
