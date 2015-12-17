@@ -126,48 +126,88 @@ void displayDuckHit(SDL_Surface *screen, Duck duck[], int current_wave, SDL_Surf
     }
 }
 
-//void sortBestScores(Player bestScores[], Player lastPlayer) //pas encore fonctionnel
-//{
-//    int i =0;
-//    bool asChanged = false;
-//    ifstream readHS("./Projet_Qt/DuckHunt/highscores.txt", ios::in);
-//    if(readHS)
-//    {
-//        for(i=0 ; i<5 ; i++)
-//        {
-//            readHS >> bestScores[i].name;
-//            readHS >> bestScores[i].score;
-//        }
 
-//        readHS.close();
-//    }
+void sortBestScores(Player bestScores[], Player lastPlayer)
+{
+    int i =0;
+    bool asChanged = false;
+    ifstream readHS("/tmp/highscores.txt", ios::in);
+    if(readHS)
+    {
+        for(i=0 ; i<5 ; i++)
+        {
+            readHS >> bestScores[i].name;
+            readHS >> bestScores[i].score;
+        }
+
+        readHS.close();
+    }
 
 
-//    else
-//        return;
+    else
+        return;
 
-//    for(i=0 ; i<5 && !asChanged; i++)
-//    {
-//        if (bestScores[i].score < lastPlayer.score)
-//        {
-//            bestScores[i].score = lastPlayer.score;
-//            bestScores[i].name = lastPlayer.name;
-//            asChanged = true;
-//        }
-//    }
+    string pseudo = "";
+    for(i=0 ; i<5 && !asChanged; i++)
+    {
+        if (bestScores[i].score < lastPlayer.score)
+        {
+            asChanged = true;
+            lastPlayer.name.erase(lastPlayer.name.begin(),lastPlayer.name.begin()+8);
 
-//    if(asChanged)
-//    {
-//        ofstream writeHS("./Projet_Qt/DuckHunt/highscores.txt", ios::out);
-//        if(writeHS)
-//        {
-//            for(i=0 ; i<5 ; i++)
-//            {
-//                writeHS << bestScores[i].name << " ";
-//                writeHS << bestScores[i].score << std::endl;
-//            }
-//            writeHS.close();
-//        }
-//    }
-//}
+            for(int j=0 ; j<lastPlayer.name.size() ; j++)
+            {
+                if(lastPlayer.name.at(j)!='_' && lastPlayer.name.at(j)!=' ')
+                    pseudo+=lastPlayer.name.at(j);
+            }
 
+            lastPlayer.name = pseudo;
+
+            for(int j=4 ; j>i ; j--)
+            {
+                bestScores[j].name = bestScores[j-1].name;
+                bestScores[j].score = bestScores[j-1].score;
+            }
+
+            bestScores[i].score = lastPlayer.score;
+            bestScores[i].name = lastPlayer.name;
+        }
+    }
+
+    if(asChanged)
+    {
+        ofstream writeHS("/tmp/highscores.txt", ios::out);
+        if(writeHS)
+        {
+            for(i=0 ; i<5 ; i++)
+            {
+                writeHS << bestScores[i].name << " ";
+                writeHS << bestScores[i].score << std::endl;
+            }
+            writeHS.close();
+        }
+    }
+}
+
+void createFile()
+{
+    if(doesFileExists("/tmp/highscores.txt"))
+        return;
+
+    ofstream writeHS("/tmp/highscores.txt", ios::out);
+    if(writeHS)
+    {
+        for(int i=0 ; i<5 ; i++)
+        {
+            writeHS << "nobody ";
+            writeHS << 0 << std::endl;
+        }
+        writeHS.close();
+    }
+}
+
+bool doesFileExists (char* name)
+{
+    std::ifstream infile(name);
+    return infile.good();
+}

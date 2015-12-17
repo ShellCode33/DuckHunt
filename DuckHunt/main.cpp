@@ -84,23 +84,36 @@ int main(int argc, char **argv)
     TTF_Font* big_font = TTF_OpenFont("res/font/duck_hunt.ttf", 90);
     SDL_Color blackcolor = {0, 0, 0, 0};
 
+
     Button singleplayer;
     singleplayer.surface = TTF_RenderText_Solid(normal_font, "Play", blackcolor);
-    singleplayer.x = SCREEN_WIDTH/2;
-    singleplayer.y = SCREEN_HEIGHT/3;
     singleplayer.select = true;
+    singleplayer.x = (SCREEN_WIDTH - singleplayer.surface->w) / 2;
+    singleplayer.y = SCREEN_HEIGHT / 4 - singleplayer.surface->h / 2;
 
     Button quit;
     quit.surface = TTF_RenderText_Solid(normal_font, "Quit", blackcolor);
-    quit.x = SCREEN_WIDTH/2;
-    quit.y = SCREEN_HEIGHT/2;
     quit.select = false;
+    quit.x = (SCREEN_WIDTH - quit.surface->w) / 2;
+    quit.y = (SCREEN_HEIGHT  - quit.surface->h) - SCREEN_HEIGHT/4;
 
     Button ok; //bouton de retour au menu lorsque Game Over
     ok.surface = TTF_RenderText_Solid(vsmall_font, "Ok", blackcolor);
     ok.x = SCREEN_WIDTH / 2;
     ok.y = SCREEN_HEIGHT / 2;
     ok.select = false;
+
+    Button highscores;
+    highscores.surface = TTF_RenderText_Solid(normal_font, "Highscores", blackcolor);
+    highscores.select = false;
+    highscores.x = (SCREEN_WIDTH - highscores.surface->w) / 2;
+    highscores.y = (SCREEN_HEIGHT ) /2 + SCREEN_HEIGHT/28;
+
+    Button boss_button;
+    boss_button.surface = TTF_RenderText_Solid(normal_font, "Boss", blackcolor);
+    boss_button.select = false;
+    boss_button.x = (SCREEN_WIDTH - boss_button.surface->w) / 2;
+    boss_button.y = (SCREEN_HEIGHT - boss_button.surface->h*3) /2;
 
     SDL_Rect user_name_dst;
     user_name_dst.w = SCREEN_WIDTH / 4;
@@ -154,7 +167,17 @@ int main(int argc, char **argv)
     Player bestScores[5];
     bool nameEntered = false; //booléen qui test si le nom du joueur a été entré à la fin
 
+    SDL_Surface *hs_to_menu = TTF_RenderText_Solid(normal_font, "Back", blackcolor);
+    SDL_Rect hs_rect;
+    SDL_Rect back_menu_rect;
+    back_menu_rect.x = SCREEN_WIDTH - SCREEN_WIDTH/4;
+    back_menu_rect.y = SCREEN_HEIGHT - SCREEN_HEIGHT/10;
+
     //------------------------------------------------------------
+
+    //On crée le fichier de score si il n'existe pas
+    createFile();
+
 
     // program main loop
     bool done = false;
@@ -186,7 +209,7 @@ int main(int argc, char **argv)
 
             if(display == MENU)
             {
-                switch(detectMouseMenu(singleplayer, quit, event))
+                switch(detectMouseMenu(singleplayer, quit, boss_button, highscores,event))
                 {
                     case 1:
                         display = GAME;
@@ -195,6 +218,15 @@ int main(int argc, char **argv)
 
                     case -1: //quitter
                         done = true;
+                        break;
+
+                    case 2: //boss
+                        display=GAME;
+                        gs=BOSS;
+                        break;
+
+                    case 3: //highscores
+                        display=HIGHSCORES;
                         break;
                 }
             }
@@ -205,9 +237,8 @@ int main(int argc, char **argv)
                 {
                     ok.select = true;
 
-                    if(event.type == SDL_MOUSEBUTTONDOWN)
+                    if(event.type == SDL_MOUSEBUTTONDOWN && nb_lettres_entrees > 0)
                     {
-                        display = MENU;
                         nameEntered = true;
                     }
                 }
@@ -262,6 +293,24 @@ int main(int argc, char **argv)
             {
                 if(killBoss(boss, event.motion.x, event.motion.y))
                     score += 500;
+            }
+
+            else if(display == HIGHSCORES)
+            {
+                if(event.motion.x < (back_menu_rect.x + back_menu_rect.w) && event.motion.x > back_menu_rect.x && event.motion.y < (back_menu_rect.y+back_menu_rect.h) && event.motion.y > back_menu_rect.y)
+                {
+                    SDL_FreeSurface(hs_to_menu);
+                    hs_to_menu = TTF_RenderText_Solid(big_font, "Back", blackcolor);
+
+                    if(event.type == SDL_MOUSEBUTTONDOWN)
+                        display=MENU;
+                }
+
+                else
+                {
+                    SDL_FreeSurface(hs_to_menu);
+                    hs_to_menu = TTF_RenderText_Solid(normal_font, "Back", blackcolor);
+                }
             }
 
         } // end of message processing
@@ -663,6 +712,40 @@ int main(int argc, char **argv)
                 break;
             }
 
+            case HIGHSCORES:
+            {
+                SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 136, 255));
+                SDL_Surface *score = NULL;
+
+                ifstream readHS("./Projet_Qt/DuckHunt/highscores.txt", ios::in);
+                if(readHS)
+                {
+                    for(i=0 ; i<5 ; i++)
+                    {
+                        readHS >> bestScores[i].name;
+                        readHS >> bestScores[i].score;
+                    }
+                    readHS.close();
+                }
+
+                for(int i= 0 ; i<5 ; i++)
+                {
+                    score = TTF_RenderText_Solid(normal_font, (bestScores[i].name+" - "+to_string(bestScores[i].score)).c_str(), blackcolor);
+                    hs_rect.y = SCREEN_HEIGHT/10 + (i*score->h)*2;
+                    hs_rect.x = (SCREEN_WIDTH-score->w)/2;
+
+                    SDL_BlitSurface(score, NULL, screen, &hs_rect);
+
+                    SDL_FreeSurface(score);
+                }
+
+                back_menu_rect.y = SCREEN_HEIGHT - SCREEN_HEIGHT/10 - hs_to_menu->h / 2;
+                back_menu_rect.x = SCREEN_WIDTH - SCREEN_WIDTH/4 - hs_to_menu->w/2;
+                SDL_BlitSurface(hs_to_menu, NULL, screen, &back_menu_rect);
+
+                break;
+            }
+
             case GAME_OVER:
             {
                 SDL_BlitSurface(background, NULL, screen, &dst_background); //on affiche l'image de fond
@@ -728,11 +811,14 @@ int main(int argc, char **argv)
     SDL_FreeSurface(background);
     SDL_FreeSurface(fake_background);
     SDL_FreeSurface(duck_hit_img);
+    SDL_FreeSurface(hs_to_menu);
 
 
     SDL_FreeSurface(singleplayer.surface);
     SDL_FreeSurface(ok.surface);
     SDL_FreeSurface(quit.surface);
+    SDL_FreeSurface(highscores.surface);
+    SDL_FreeSurface(boss.surface);
 
     deleteDog(dog);
     deleteBoss(boss);

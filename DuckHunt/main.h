@@ -12,7 +12,8 @@ enum Display
 {
     MENU,
     GAME,
-    GAME_OVER
+    GAME_OVER,
+    HIGHSCORES
 };
 
 enum GameState

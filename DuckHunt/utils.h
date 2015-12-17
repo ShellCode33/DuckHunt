@@ -95,5 +95,7 @@ void displayBulletLeft(SDL_Surface *screen, SDL_Surface *bullet_img, int bullet_
 void displayScore(SDL_Surface *screen, TTF_Font* font, int score, int mode);
 void displayDuckHit(SDL_Surface *screen, Duck duck[], int current_wave, SDL_Surface *duck_hit_img);
 void sortBestScores(Player bestScores[], Player lastPlayer);
+void createFile();
+bool doesFileExists (char* name);
 
 #endif
