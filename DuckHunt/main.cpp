@@ -56,8 +56,8 @@ int main(int argc, char **argv)
 
 
 
-    Display display = GAME;
-    GameState gs = BOSS;
+    Display display = MENU;
+    GameState gs = DOG;
 
     SDL_Surface* entity_sprites = loadImageWithColorKey("res/sprites/duck.png", true, 228, 255, 0);
     SDL_Surface* background = loadImageWithColorKey("res/sprites/backGame.png", false, 0, 0, 0);
@@ -716,15 +716,34 @@ int main(int argc, char **argv)
         SDL_Delay(10);
     } // end main loop
 
+    TTF_CloseFont(vsmall_font);
+    TTF_CloseFont(small_font);
     TTF_CloseFont(normal_font);
     TTF_CloseFont(big_font);
+
     SDL_FreeSurface(entity_sprites);
     SDL_FreeSurface(menu_img);
     SDL_FreeSurface(cursor_img);
     SDL_FreeSurface(bullet_img);
     SDL_FreeSurface(background);
     SDL_FreeSurface(fake_background);
+    SDL_FreeSurface(duck_hit_img);
+
+
+    SDL_FreeSurface(singleplayer.surface);
+    SDL_FreeSurface(ok.surface);
+    SDL_FreeSurface(quit.surface);
+
     deleteDog(dog);
+    deleteBoss(boss);
+
+
+    SDL_FreeSurface(sniper);
+    SDL_FreeSurface(big_dog);
+
+
+    for(i = 0; i < 5; i++)
+        SDL_FreeSurface(boss_bg[i]);
 
     //------ Remove DuckScore struct ------
     for(i = 0; i < 2; i++)
