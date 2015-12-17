@@ -13,6 +13,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <string>
+#include <fstream>
 using namespace std;
 
 #define SCREEN_WIDTH 750

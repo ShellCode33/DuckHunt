@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 
 
 
-    Display display = MENU;
+    Display display = GAME_OVER;
     GameState gs = DOG;
 
     SDL_Surface* entity_sprites = loadImageWithColorKey("res/sprites/duck.png", true, 228, 255, 0);
@@ -103,7 +103,7 @@ int main(int argc, char **argv)
     user_name_dst.w = SCREEN_WIDTH / 4;
     user_name_dst.h = 35;
     user_name_dst.x = (SCREEN_WIDTH) / 2 - user_name_dst.w;
-    user_name_dst.y = (SCREEN_HEIGHT) / 3;
+    user_name_dst.y = (SCREEN_HEIGHT) / 2 - SCREEN_HEIGHT/10;
 
 
     SDL_Rect dst_background;
@@ -617,13 +617,16 @@ int main(int argc, char **argv)
                 {
                     ok.surface = TTF_RenderText_Solid(small_font, "Ok", blackcolor);
 
-                    if(nameEntered)
-                        ;//sortBestScores(bestScores, current_user);
+//                    if(nameEntered);
+//                    {
+//                        score = 8000;
+//                        current_user.score = score;
+//                        sortBestScores(bestScores, current_user);
+//                    }
                 }
 
                 else
                     ok.surface = TTF_RenderText_Solid(vsmall_font, "Ok", blackcolor);
-
 
                 ok.x = (SCREEN_WIDTH-ok.surface->w) / 2;
                 ok.y = (SCREEN_HEIGHT-ok.surface->h) / 2;

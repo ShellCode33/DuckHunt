@@ -125,48 +125,49 @@ void displayDuckHit(SDL_Surface *screen, Duck duck[], int current_wave, SDL_Surf
         dst_rect.x += dst_rect.w + 3;
     }
 }
-/*
-void sortBestScores(Player bestScores[], Player lastPlayer) //pas encore fonctionnel
-{
-    int i =0;
-    bool asChanged = false;
-    ifstream readHS("highscores.txt", ios::in);
-    if(readHS)
-    {
-        for(i=0 ; i<5 ; i++)
-        {
-            readHS >> bestScores[i].name;
-            readHS >> bestScores[i].score;
-        }
 
-        readHS.close();
-    }
+//void sortBestScores(Player bestScores[], Player lastPlayer) //pas encore fonctionnel
+//{
+//    int i =0;
+//    bool asChanged = false;
+//    ifstream readHS("./Projet_Qt/DuckHunt/highscores.txt", ios::in);
+//    if(readHS)
+//    {
+//        for(i=0 ; i<5 ; i++)
+//        {
+//            readHS >> bestScores[i].name;
+//            readHS >> bestScores[i].score;
+//        }
 
-    else
-        return;
+//        readHS.close();
+//    }
 
-    for(i=0 ; i<5 ; i++)
-    {
-        if (bestScores[i].score < lastPlayer.score)
-        {
-            bestScores[i].score = lastPlayer.score;
-            bestScores[i].name = lastPlayer.name;
-            asChanged = true;
-        }
-    }
 
-    if(asChanged)
-    {
-        ofstream writeHS("highscores.txt", ios::out | ios::trunc);
-        if(writeHS)
-        {
-            for(i=0 ; i<5 ; i++)
-            {
-                writeHS << bestScores[i].name << " ";
-                writeHS << bestScores[i].score << std::endl;
-            }
-        }
+//    else
+//        return;
 
-    }
-}
-*/
+//    for(i=0 ; i<5 && !asChanged; i++)
+//    {
+//        if (bestScores[i].score < lastPlayer.score)
+//        {
+//            bestScores[i].score = lastPlayer.score;
+//            bestScores[i].name = lastPlayer.name;
+//            asChanged = true;
+//        }
+//    }
+
+//    if(asChanged)
+//    {
+//        ofstream writeHS("./Projet_Qt/DuckHunt/highscores.txt", ios::out);
+//        if(writeHS)
+//        {
+//            for(i=0 ; i<5 ; i++)
+//            {
+//                writeHS << bestScores[i].name << " ";
+//                writeHS << bestScores[i].score << std::endl;
+//            }
+//            writeHS.close();
+//        }
+//    }
+//}
+
