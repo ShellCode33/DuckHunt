@@ -214,6 +214,7 @@ int main(int argc, char **argv)
                     case 1:
                         display = GAME;
                         SDL_ShowCursor(SDL_DISABLE); //cache le curseur
+                        score = 0;
                         break;
 
                     case -1: //quitter
@@ -223,6 +224,8 @@ int main(int argc, char **argv)
                     case 2: //boss
                         display=GAME;
                         gs=BOSS;
+                        big_dog_laughing = false;
+                        score=0;
                         break;
 
                     case 3: //highscores
@@ -322,7 +325,7 @@ int main(int argc, char **argv)
         {
             case MENU:
             {
-                showMenu(screen, menu_img, normal_font, big_font, singleplayer, quit);
+                showMenu(screen, menu_img, normal_font, big_font, singleplayer, quit, highscores, boss_button);
                 break;
             }
 
@@ -585,6 +588,7 @@ int main(int argc, char **argv)
 
                     case BOSS:
                     {
+
                         if(big_dog_laughing)
                         {
                             SDL_BlitSurface(boss_bg[0], NULL, screen, NULL); //on raffiche le bg
@@ -603,6 +607,11 @@ int main(int argc, char **argv)
                             {
                                 display = GAME_OVER;
                                 big_dog_laughing = false;
+                                boss_coming = false;
+
+                                //On reset
+                                deleteBoss(boss);
+                                initBoss(entity_sprites, boss, current_wave);
                             }
 
                             int mod_sprite = boss.dogs[0]->cooldown % 8;
@@ -717,7 +726,7 @@ int main(int argc, char **argv)
                 SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 136, 255));
                 SDL_Surface *score = NULL;
 
-                ifstream readHS("./Projet_Qt/DuckHunt/highscores.txt", ios::in);
+                ifstream readHS("/tmp/highscores.txt", ios::in);
                 if(readHS)
                 {
                     for(i=0 ; i<5 ; i++)
@@ -770,17 +779,21 @@ int main(int argc, char **argv)
                 if(ok.select)
                 {
                     ok.surface = TTF_RenderText_Solid(small_font, "Ok", blackcolor);
-
-//                    if(nameEntered);
-//                    {
-//                        score = 8000;
-//                        current_user.score = score;
-//                        sortBestScores(bestScores, current_user);
-//                    }
                 }
 
                 else
                     ok.surface = TTF_RenderText_Solid(vsmall_font, "Ok", blackcolor);
+
+                if(nameEntered)
+                {
+                    current_user.score = score;
+                    sortBestScores(bestScores, current_user);
+                    current_user.name = "Pseudo: _ _ _ _ _ _ _ _ _";
+                    current_user.score = 0;
+                    display = MENU;
+                    gs = DOG;
+                    nameEntered = false;
+                }
 
                 ok.x = (SCREEN_WIDTH-ok.surface->w) / 2;
                 ok.y = (SCREEN_HEIGHT-ok.surface->h) / 2;
@@ -818,7 +831,7 @@ int main(int argc, char **argv)
     SDL_FreeSurface(ok.surface);
     SDL_FreeSurface(quit.surface);
     SDL_FreeSurface(highscores.surface);
-    SDL_FreeSurface(boss.surface);
+    SDL_FreeSurface(boss_button.surface);
 
     deleteDog(dog);
     deleteBoss(boss);
